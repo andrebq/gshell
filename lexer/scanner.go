@@ -14,18 +14,25 @@ type (
 	}
 )
 
-func newScanner(c []byte) (*scanner, error) {
+func newScanner(c []byte, injectNewline bool) (*scanner, error) {
 	if !utf8.Valid(c) {
 		return nil, errors.New("not utf8")
 	}
 	s := &scanner{
-		code: make([]rune, 0, utf8.RuneCount(c)),
+		code: make([]rune, 0, utf8.RuneCount(c)+1),
 		pos:  -1,
+	}
+	if bytes.HasSuffix(c, []byte("\n")) && injectNewline {
+		// no need to inject the newline because the line already contains a newline
+		injectNewline = false
 	}
 	for len(c) > 0 {
 		r, sz := utf8.DecodeRune(c)
 		s.code = append(s.code, r)
 		c = c[sz:]
+	}
+	if injectNewline {
+		s.code = append(s.code, '\n')
 	}
 	return s, nil
 }
@@ -47,8 +54,28 @@ func (s *scanner) scanTextInQuotes() string {
 }
 
 func (s *scanner) scanNumber() string {
-	// TODO: handle float numbers here
-	return s.scanWhile(unicode.IsDigit)
+	buf := bytes.Buffer{}
+	foundDot := false
+	for !s.eof() {
+		if unicode.IsDigit(s.peek()) {
+			buf.WriteRune(s.read())
+		} else if s.peek() == '.' && !foundDot {
+			buf.WriteRune(s.read())
+		} else {
+			break
+		}
+	}
+	return buf.String()
+}
+
+func (s *scanner) unread() {
+	s.pos--
+}
+
+func (s *scanner) read() rune {
+	p := s.peek()
+	s.next()
+	return p
 }
 
 func (s *scanner) peek() rune {
