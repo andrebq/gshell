@@ -37,6 +37,34 @@ const (
 	RawComment
 )
 
+func (lt LexemType) String() string {
+	switch lt {
+	case BeginCommand:
+		return "BeginCommand"
+	case EndCommand:
+		return "EndCommand"
+	case Identifier:
+		return "Identifier"
+	case OpenProgram:
+		return "OpenProgram"
+	case CloseProgram:
+		return "CloseProgram"
+	case Whitespace:
+		return "Whitespace"
+	case QuotedText:
+		return "QuotedText"
+	case Number:
+		return "Number"
+	case OrOperator:
+		return "OrOperator"
+	case PipeConnector:
+		return "PipeConnector"
+	case RawComment:
+		return "RawComment"
+	}
+	return fmt.Sprintf("Undefined(%v)", byte(lt))
+}
+
 func (l Lexem) String() string {
 	return fmt.Sprintf("%d:%v", l.Type, l.Value)
 }
