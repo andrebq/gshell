@@ -66,7 +66,7 @@ func (lt LexemType) String() string {
 }
 
 func (l Lexem) String() string {
-	return fmt.Sprintf("%d:%v", l.Type, l.Value)
+	return fmt.Sprintf("%v:%v", l.Type, l.Value)
 }
 
 func Lex(code []byte) ([]Lexem, error) {

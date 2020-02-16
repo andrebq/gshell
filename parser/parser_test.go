@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"github.com/andrebq/gshell/ast"
+	. "github.com/andrebq/gshell/ast/astutil"
 	"github.com/andrebq/gshell/lexer"
 	"io/ioutil"
 	"path/filepath"
@@ -23,7 +23,11 @@ func TestParseInteractive(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := &ast.Pipeline{}
+
+	expected := Pipeline(
+		Command(
+			Identifier("echo"), QuotedText("hello"), Number("1234"), Identifier("ola"), Number("234.34")))
+
 	if !reflect.DeepEqual(pipeline, expected) {
 		t.Errorf("Expecting %v got %v", expected, pipeline)
 	}

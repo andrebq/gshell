@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/andrebq/gshell/ast"
+	"github.com/andrebq/gshell/ast/astutil"
 	"github.com/andrebq/gshell/lexer"
 )
 
@@ -15,6 +16,7 @@ type (
 )
 
 func ParseInteractive(tokens []lexer.Lexem) (*ast.Pipeline, error) {
+	println(fmt.Sprintf("tokens: %v", tokens))
 	p := &Parser{
 		tokens: tokens,
 		pos:    -1,
@@ -25,10 +27,6 @@ func ParseInteractive(tokens []lexer.Lexem) (*ast.Pipeline, error) {
 
 	pline, err := parsePipeline(p)
 	if err != nil {
-		return nil, err
-	}
-
-	if err := p.find(lexer.EndCommand); err != nil {
 		return nil, err
 	}
 	return pline, nil
@@ -42,7 +40,9 @@ func parsePipeline(p *Parser) (*ast.Pipeline, error) {
 			return nil, err
 		}
 		pl.Items = append(pl.Items, cmd)
-		if p.cur().Type == lexer.PipeConnector {
+		if p.cur().Type == lexer.EndCommand {
+			break
+		} else if p.cur().Type == lexer.PipeConnector {
 			return nil, errors.New("pipe not implemented")
 		}
 	}
@@ -55,14 +55,14 @@ func parseOneCommand(p *Parser) (*ast.Command, error) {
 		return nil, err
 	}
 	p.next()
-	cmd.Identifier = p.cur()
+	cmd.Identifier = astutil.Identifier(p.cur().Value)
 	for p.next() {
-		println("Cur: ", p.cur().Type.String())
 		switch p.cur().Type {
-		case lexer.EndCommand, lexer.PipeConnector:
-			println("end command")
+		case lexer.PipeConnector:
 			p.prev()
-			return cmd, nil
+			break
+		case lexer.EndCommand:
+			break
 		case lexer.Identifier:
 			cmd.Arguments = append(cmd.Arguments, &ast.Identifier{Name: p.cur()})
 		case lexer.Number:
@@ -71,6 +71,7 @@ func parseOneCommand(p *Parser) (*ast.Command, error) {
 			cmd.Arguments = append(cmd.Arguments, &ast.QuotedText{Text: p.cur()})
 		}
 	}
+
 	return cmd, nil
 }
 
@@ -114,16 +115,16 @@ func (p *Parser) next() bool {
 		return false
 	}
 	p.pos++
-	return true
+	return !p.eof()
 }
 
 func (p *Parser) cur() lexer.Lexem {
-	if p.eof() {
+	if p.pos == len(p.tokens) {
 		return lexer.Lexem{}
 	}
 	return p.tokens[p.pos]
 }
 
 func (p *Parser) eof() bool {
-	return p.pos == len(p.tokens)-1
+	return p.pos == len(p.tokens)
 }
