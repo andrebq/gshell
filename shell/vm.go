@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/andrebq/gshell/ast"
+	"github.com/andrebq/gshell/lexer"
+	"github.com/andrebq/gshell/parser"
 )
 
 type (
@@ -12,7 +14,32 @@ type (
 	VM struct {
 		programs    map[string]*Program
 		environment map[string]string
+		builtin     map[string]Builtin
 	}
+
+	// CallContext contains the information that a VM
+	// can provide for a Program/Builtin
+	CallContext struct {
+		// Command contains the command identifier and all arguments
+		//
+		// In case of a Builtin program arguments might contain other programs,
+		// in case of normal programs or other scripts, arguments are made up
+		// of atomic units as those need to serialized.
+		Command *ast.Command
+
+		// VM contains the link to the underlying VM
+		VM *VM
+
+		// TODO(andre): add here the IO ports
+	}
+
+	// Builtin implements a internal VM command
+	Builtin interface {
+		Run(*CallContext) error
+	}
+
+	// BuiltinFunc implements Builtin for simple functions
+	BuiltinFunc func(*CallContext) error
 
 	Program struct {
 		pipelines []*pipeline
@@ -38,6 +65,23 @@ func NewVM() *VM {
 		programs:    make(map[string]*Program),
 		environment: make(map[string]string),
 	}
+}
+
+func (v *VM) ParseInteractive(name, code string) error {
+	l, err := lexer.Lex([]byte(code))
+	if err != nil {
+		return err
+	}
+	pipeline, err := parser.ParseInteractive(l)
+	if err != nil {
+		return err
+	}
+	prog := NewProgram(pipeline)
+	if err != nil {
+		return err
+	}
+	v.programs[name] = prog
+	return nil
 }
 
 func (v *VM) Run(name string) error {
@@ -84,4 +128,8 @@ func newArgument(n ast.Node) argument {
 		return argument{n.Name.Value}
 	}
 	panic(fmt.Sprintf("cannot handle argument [%v]", n))
+}
+
+func (bf BuiltinFunc) Run(c *CallContext) error {
+	return bf(c)
 }

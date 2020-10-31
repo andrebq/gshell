@@ -3,6 +3,7 @@ package parser
 import (
 	"errors"
 	"fmt"
+
 	"github.com/andrebq/gshell/ast"
 	"github.com/andrebq/gshell/ast/astutil"
 	"github.com/andrebq/gshell/lexer"
@@ -15,8 +16,30 @@ type (
 	}
 )
 
+func ParseProgram(tokens []lexer.Lexem) (*ast.Program, error) {
+	p := &Parser{
+		tokens: tokens,
+		pos:    -1,
+	}
+	if err := p.find(lexer.OpenProgram); err != nil {
+		return nil, err
+	}
+	var pipelines []*ast.Pipeline
+	for p.cur().Type != lexer.CloseProgram {
+		pline, err := parsePipeline(p)
+		if err != nil {
+			return nil, err
+		}
+		pipelines = append(pipelines, pline)
+	}
+	err := p.find(lexer.CloseProgram)
+	if err != nil {
+		return nil, err
+	}
+	return astutil.Program(pipelines...), nil
+}
+
 func ParseInteractive(tokens []lexer.Lexem) (*ast.Pipeline, error) {
-	println(fmt.Sprintf("tokens: %v", tokens))
 	p := &Parser{
 		tokens: tokens,
 		pos:    -1,
@@ -24,6 +47,7 @@ func ParseInteractive(tokens []lexer.Lexem) (*ast.Pipeline, error) {
 	if err := p.find(lexer.BeginCommand); err != nil {
 		return nil, err
 	}
+	p.prev()
 
 	pline, err := parsePipeline(p)
 	if err != nil {
@@ -35,6 +59,10 @@ func ParseInteractive(tokens []lexer.Lexem) (*ast.Pipeline, error) {
 func parsePipeline(p *Parser) (*ast.Pipeline, error) {
 	pl := &ast.Pipeline{}
 	for !p.eof() {
+		err := p.find(lexer.BeginCommand)
+		if err != nil {
+			return nil, err
+		}
 		cmd, err := parseOneCommand(p)
 		if err != nil {
 			return nil, err

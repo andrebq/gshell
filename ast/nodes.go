@@ -24,6 +24,11 @@ type (
 
 	baseNode struct{}
 
+	Program struct {
+		baseNode
+		Instructions []*Pipeline
+	}
+
 	Pipeline struct {
 		baseNode
 		Items []*Command

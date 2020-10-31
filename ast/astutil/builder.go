@@ -11,6 +11,12 @@ func Pipeline(items ...*ast.Command) *ast.Pipeline {
 	}
 }
 
+func Program(items ...*ast.Pipeline) *ast.Program {
+	return &ast.Program{
+		Instructions: items,
+	}
+}
+
 func Command(name *ast.Identifier, args ...ast.Node) *ast.Command {
 	return &ast.Command{
 		Identifier: name,
