@@ -17,13 +17,12 @@ func TestLexer(t *testing.T) {
 		t.Fatal(err)
 	}
 	expected := []Lexem{
-		Lexem{BeginCommand, ""},
 		Lexem{Identifier, "echo"},
 		Lexem{QuotedText, "hello"},
 		Lexem{Number, "1234"},
 		Lexem{Identifier, "ola"},
 		Lexem{Number, "234.34"},
-		Lexem{EndCommand, ""},
+		Lexem{Terminator, ""},
 	}
 	if !reflect.DeepEqual(lex, expected) {
 		t.Errorf("Should be %v got: %v", expected, lex)
@@ -40,13 +39,12 @@ func TestPipeline(t *testing.T) {
 		t.Fatal(err)
 	}
 	expected := []Lexem{
-		Lexem{BeginCommand, ""},
 		Lexem{Identifier, "echo"},
 		Lexem{QuotedText, "hello"},
 		Lexem{PipeConnector, "|"},
 		Lexem{Identifier, "cat"},
 		Lexem{Identifier, "output.txt"},
-		Lexem{EndCommand, ""},
+		Lexem{Terminator, ""},
 	}
 	if !reflect.DeepEqual(lex, expected) {
 		t.Errorf("Should be %v got %v", expected, lex)

@@ -24,8 +24,6 @@ type (
 
 const (
 	Undefined = LexemType(iota)
-	BeginCommand
-	EndCommand
 	Identifier
 	OpenProgram
 	CloseProgram
@@ -35,14 +33,11 @@ const (
 	OrOperator
 	PipeConnector
 	RawComment
+	Terminator
 )
 
 func (lt LexemType) String() string {
 	switch lt {
-	case BeginCommand:
-		return "BeginCommand"
-	case EndCommand:
-		return "EndCommand"
 	case Identifier:
 		return "Identifier"
 	case OpenProgram:
@@ -91,7 +86,6 @@ func Lex(code []byte) ([]Lexem, error) {
 }
 
 func filter(out chan<- lexemOrErr, in <-chan lexemOrErr) {
-	first := true
 	endCommand := false
 	defer close(out)
 	for l := range in {
@@ -103,16 +97,10 @@ func filter(out chan<- lexemOrErr, in <-chan lexemOrErr) {
 			out <- l
 			continue
 		}
-		if first {
-			first = false
-			out <- lexemOrErr{l: Lexem{Type: BeginCommand, Value: ""}}
-			out <- l
-			continue
-		}
-		if l.l.Type == EndCommand && endCommand {
+		if l.l.Type == Terminator && endCommand {
 			// no need to duplicate end-command discard the current item
 			continue
-		} else if l.l.Type == EndCommand {
+		} else if l.l.Type == Terminator {
 			// this is the first EndCommand token, let it pass and toggle endCommand so we can filter out the other ones
 			endCommand = true
 			out <- l
@@ -209,8 +197,8 @@ func lexNext(out chan<- lexemOrErr, sc *scanner) stateFn {
 	} else if r == '|' {
 		sc.unread()
 		return lexPipeline
-	} else if r == '\n' {
-		out <- lexemOrErr{l: Lexem{Type: EndCommand, Value: ""}}
+	} else if r == '\n' || r == ';' {
+		out <- lexemOrErr{l: Lexem{Type: Terminator, Value: ""}}
 	} else {
 		sc.unread()
 		out <- lexemOrErr{e: fmt.Errorf("unexpected character %v", string(sc.peek()))}

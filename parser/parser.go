@@ -44,7 +44,7 @@ func ParseInteractive(tokens []lexer.Lexem) (*ast.Pipeline, error) {
 		tokens: tokens,
 		pos:    -1,
 	}
-	if err := p.find(lexer.BeginCommand); err != nil {
+	if err := p.find(lexer.Identifier); err != nil {
 		return nil, err
 	}
 	p.prev()
@@ -59,16 +59,19 @@ func ParseInteractive(tokens []lexer.Lexem) (*ast.Pipeline, error) {
 func parsePipeline(p *Parser) (*ast.Pipeline, error) {
 	pl := &ast.Pipeline{}
 	for !p.eof() {
-		err := p.find(lexer.BeginCommand)
+		err := p.find(lexer.Identifier)
 		if err != nil {
 			return nil, err
 		}
+		p.prev()
 		cmd, err := parseOneCommand(p)
 		if err != nil {
 			return nil, err
 		}
 		pl.Items = append(pl.Items, cmd)
-		if p.cur().Type == lexer.EndCommand {
+		if p.cur().Type == lexer.Terminator {
+			break
+		} else if p.cur().Type == lexer.CloseProgram {
 			break
 		} else if p.cur().Type == lexer.PipeConnector {
 			return nil, errors.New("pipe not implemented")
@@ -89,7 +92,10 @@ func parseOneCommand(p *Parser) (*ast.Command, error) {
 		case lexer.PipeConnector:
 			p.prev()
 			break
-		case lexer.EndCommand:
+		case lexer.Terminator:
+			break
+		case lexer.CloseProgram:
+			p.prev()
 			break
 		case lexer.Identifier:
 			cmd.Arguments = append(cmd.Arguments, &ast.Identifier{Name: p.cur()})
