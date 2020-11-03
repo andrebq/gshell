@@ -72,7 +72,7 @@ func parsePipeline(p *Parser) (*ast.Pipeline, error) {
 		if p.cur().Type == lexer.Terminator {
 			break
 		} else if p.cur().Type == lexer.CloseProgram {
-			break
+			return nil, errors.New("expecting a Terminator before CloseProgram")
 		} else if p.cur().Type == lexer.PipeConnector {
 			return nil, errors.New("pipe not implemented")
 		}

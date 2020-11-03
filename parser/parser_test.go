@@ -3,9 +3,10 @@ package parser
 import (
 	"io/ioutil"
 	"path/filepath"
+	"reflect"
 	"testing"
 
-	_ "github.com/andrebq/gshell/ast/astutil"
+	. "github.com/andrebq/gshell/ast/astutil"
 	"github.com/andrebq/gshell/lexer"
 )
 
@@ -20,19 +21,19 @@ func TestParseInteractive(t *testing.T) {
 	}
 	t.Logf("Tokens: %v", tokens)
 	t.Logf("Semantics have changed")
-	t.FailNow()
 
-	// pipeline, err := ParseInteractive(lex)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
+	pipeline, err := ParseInteractive(tokens)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = pipeline
 
-	// expected := Pipeline(Command(
-	// 	Identifier("echo"), QuotedText("hello"), Number("1234"), Identifier("ola"), Number("234.34")))
+	expected := Pipeline(Command(
+		Identifier("echo"), QuotedText("hello"), Number("1234"), Identifier("ola"), Number("234.34")))
 
-	// if !reflect.DeepEqual(pipeline, expected) {
-	// 	t.Errorf("Expecting %v got %v", expected, pipeline)
-	// }
+	if !reflect.DeepEqual(pipeline, expected) {
+		t.Errorf("Expecting %v got %v", expected, pipeline)
+	}
 }
 
 func TestParseProgram(t *testing.T) {

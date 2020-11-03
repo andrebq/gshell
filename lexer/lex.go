@@ -56,6 +56,8 @@ func (lt LexemType) String() string {
 		return "PipeConnector"
 	case RawComment:
 		return "RawComment"
+	case Terminator:
+		return "Terminator"
 	}
 	return fmt.Sprintf("Undefined(%v)", byte(lt))
 }
@@ -103,6 +105,13 @@ func filter(out chan<- lexemOrErr, in <-chan lexemOrErr) {
 		} else if l.l.Type == Terminator {
 			// this is the first EndCommand token, let it pass and toggle endCommand so we can filter out the other ones
 			endCommand = true
+			out <- l
+			continue
+		} else if l.l.Type == CloseProgram {
+			if !endCommand {
+				out <- lexemOrErr{l: Lexem{Type: Terminator}}
+				endCommand = true
+			}
 			out <- l
 			continue
 		}
