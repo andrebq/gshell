@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/andrebq/gshell/ast"
 	. "github.com/andrebq/gshell/ast/astutil"
 	"github.com/andrebq/gshell/lexer"
 )
@@ -20,7 +21,6 @@ func TestParseInteractive(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Logf("Tokens: %v", tokens)
-	t.Logf("Semantics have changed")
 
 	pipeline, err := ParseInteractive(tokens)
 	if err != nil {
@@ -47,18 +47,19 @@ func TestParseProgram(t *testing.T) {
 	}
 	t.Logf("Tokens: %v", tokens)
 	t.Logf("Semantics have changed")
-	t.FailNow()
 
+	var program *ast.Program
 	// program, err := ParseProgram(tokens)
 	// if err != nil {
 	// 	t.Fatal(err)
 	// }
+	_ = program
 
-	// expected := Program(
-	// 	Pipeline(Command(
-	// 		Identifier("echo"), QuotedText("hello"), Number("123"))))
+	expected := Program(
+		Pipeline(Command(
+			Identifier("echo"), QuotedText("hello"), Number("123"))))
 
-	// if !reflect.DeepEqual(program, expected) {
-	// 	t.Errorf("Expecting %v got %v", expected, program)
-	// }
+	if !reflect.DeepEqual(program, expected) {
+		t.Errorf("Expecting %v got %v", expected, program)
+	}
 }

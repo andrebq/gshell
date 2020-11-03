@@ -24,19 +24,8 @@ func ParseProgram(tokens []lexer.Lexem) (*ast.Program, error) {
 	if err := p.find(lexer.OpenProgram); err != nil {
 		return nil, err
 	}
-	var pipelines []*ast.Pipeline
-	for p.cur().Type != lexer.CloseProgram {
-		pline, err := parsePipeline(p)
-		if err != nil {
-			return nil, err
-		}
-		pipelines = append(pipelines, pline)
-	}
-	err := p.find(lexer.CloseProgram)
-	if err != nil {
-		return nil, err
-	}
-	return astutil.Program(pipelines...), nil
+	p.prev()
+	return parseProgram(p)
 }
 
 func ParseInteractive(tokens []lexer.Lexem) (*ast.Pipeline, error) {
@@ -54,6 +43,32 @@ func ParseInteractive(tokens []lexer.Lexem) (*ast.Pipeline, error) {
 		return nil, err
 	}
 	return pline, nil
+}
+
+func parseProgram(p *Parser) (*ast.Program, error) {
+	err := p.find(lexer.OpenProgram)
+	if err != nil {
+		return nil, err
+	}
+
+	prog := &ast.Program{}
+	for !p.eof() && p.cur().Type != lexer.CloseProgram {
+		if p.cur().Type == lexer.RawComment {
+			// we should handle comments, but for now, lets ignore it
+			p.next()
+			continue
+		}
+		pipeline, err := parsePipeline(p)
+		if err != nil {
+			return nil, err
+		}
+		prog.Instructions = append(prog.Instructions, pipeline)
+	}
+	err = p.find(lexer.CloseProgram)
+	if err != nil {
+		return nil, err
+	}
+	return prog, nil
 }
 
 func parsePipeline(p *Parser) (*ast.Pipeline, error) {
