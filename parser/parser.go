@@ -108,6 +108,7 @@ func parseOneCommand(p *Parser) (*ast.Command, error) {
 			p.prev()
 			commandComplete = true
 		case lexer.Terminator:
+			p.prev()
 			commandComplete = true
 		case lexer.CloseProgram:
 			return nil, errors.New("every command should have a terminator")

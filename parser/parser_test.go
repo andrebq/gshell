@@ -58,7 +58,10 @@ func TestParseProgram(t *testing.T) {
 
 	expected := Program(
 		Pipeline(Command(
-			Identifier("echo"), QuotedText("hello"), Number("123"))))
+			Identifier("echo"), QuotedText("hello"), Number("123"))),
+		Pipeline(Command(
+			Identifier("echo"), Number("321")),
+		))
 
 	if !reflect.DeepEqual(program, expected) {
 		t.Errorf("Expecting %v got %v", expected, program)

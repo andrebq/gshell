@@ -137,7 +137,7 @@ func lexIdentifier(out chan<- lexemOrErr, sc *scanner) stateFn {
 	if len(id) > 0 {
 		out <- lexemOrErr{l: Lexem{Type: Identifier, Value: id}}
 	}
-	return lexNext
+	return lexTerminatorOrWhitespace
 }
 
 func lexDoubleQuoteText(out chan<- lexemOrErr, sc *scanner) stateFn {
@@ -155,7 +155,7 @@ func lexDoubleQuoteText(out chan<- lexemOrErr, sc *scanner) stateFn {
 
 	out <- lexemOrErr{l: Lexem{Type: QuotedText, Value: txt}}
 
-	return lexNext
+	return lexTerminatorOrWhitespace
 }
 
 func lexNumber(out chan<- lexemOrErr, sc *scanner) stateFn {
@@ -165,7 +165,7 @@ func lexNumber(out chan<- lexemOrErr, sc *scanner) stateFn {
 		return nil
 	}
 	out <- lexemOrErr{l: Lexem{Type: Number, Value: number}}
-	return lexNext
+	return lexTerminatorOrWhitespace
 }
 
 func lexPipeline(out chan<- lexemOrErr, sc *scanner) stateFn {
@@ -184,11 +184,32 @@ func lexPipeline(out chan<- lexemOrErr, sc *scanner) stateFn {
 	return lexNext
 }
 
+func lexTerminatorOrWhitespace(out chan<- lexemOrErr, sc *scanner) stateFn {
+	for unicode.IsSpace(sc.peek()) {
+		switch sc.peek() {
+		case '\n':
+			out <- lexemOrErr{l: Lexem{Type: Terminator}}
+			sc.discardWhitespace()
+			return lexNext
+		case '\r':
+			sc.next()
+			continue
+		default:
+			sc.discardWhitespace()
+			return lexNext
+		}
+	}
+	out <- lexemOrErr{e: errors.New("expecting a whitespace or newline")}
+	return nil
+}
+
 func lexNext(out chan<- lexemOrErr, sc *scanner) stateFn {
 	r := sc.read()
 	if r == '{' {
+		sc.discardWhitespace()
 		out <- lexemOrErr{l: Lexem{Type: OpenProgram, Value: "{"}}
 	} else if r == '}' {
+		sc.discardWhitespace()
 		out <- lexemOrErr{l: Lexem{Type: CloseProgram, Value: "}"}}
 	} else if unicode.IsLetter(r) {
 		sc.unread()
