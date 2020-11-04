@@ -64,9 +64,8 @@ func parseProgram(p *Parser) (*ast.Program, error) {
 		}
 		prog.Instructions = append(prog.Instructions, pipeline)
 	}
-	err = p.find(lexer.CloseProgram)
-	if err != nil {
-		return nil, err
+	if p.cur().Type != lexer.CloseProgram {
+		return nil, errors.New("missing CloseProgram")
 	}
 	return prog, nil
 }
@@ -87,7 +86,7 @@ func parsePipeline(p *Parser) (*ast.Pipeline, error) {
 		if p.cur().Type == lexer.Terminator {
 			break
 		} else if p.cur().Type == lexer.CloseProgram {
-			return nil, errors.New("expecting a Terminator before CloseProgram")
+			break
 		} else if p.cur().Type == lexer.PipeConnector {
 			return nil, errors.New("pipe not implemented")
 		}
@@ -102,16 +101,16 @@ func parseOneCommand(p *Parser) (*ast.Command, error) {
 	}
 	p.next()
 	cmd.Identifier = astutil.Identifier(p.cur().Value)
-	for p.next() {
+	var commandComplete bool
+	for p.next() && !commandComplete {
 		switch p.cur().Type {
 		case lexer.PipeConnector:
 			p.prev()
-			break
+			commandComplete = true
 		case lexer.Terminator:
-			break
+			commandComplete = true
 		case lexer.CloseProgram:
-			p.prev()
-			break
+			return nil, errors.New("every command should have a terminator")
 		case lexer.Identifier:
 			cmd.Arguments = append(cmd.Arguments, &ast.Identifier{Name: p.cur()})
 		case lexer.Number:

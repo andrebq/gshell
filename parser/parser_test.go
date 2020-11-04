@@ -22,7 +22,8 @@ func TestParseInteractive(t *testing.T) {
 	}
 	t.Logf("Tokens: %v", tokens)
 
-	pipeline, err := ParseInteractive(tokens)
+	var pipeline *ast.Pipeline
+	pipeline, err = ParseInteractive(tokens)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,10 +50,10 @@ func TestParseProgram(t *testing.T) {
 	t.Logf("Semantics have changed")
 
 	var program *ast.Program
-	// program, err := ParseProgram(tokens)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
+	program, err = ParseProgram(tokens)
+	if err != nil {
+		t.Fatal(err)
+	}
 	_ = program
 
 	expected := Program(
