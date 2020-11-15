@@ -1,0 +1,11 @@
+package grammar
+
+import "github.com/pointlander/peg/tree"
+
+type GShell Peg {
+    *tree.Tree
+}
+
+first <- . END
+
+END <- !.
