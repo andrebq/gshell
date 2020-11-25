@@ -1,4 +1,7 @@
+github.com/antlr/antlr3 v0.0.0-20150819184006-5c2a916a1013 h1:jUe0ch/cQ9U2KOxzWFdgOrsfi9e6MsOoFppJZ7FVer0=
 github.com/antlr/antlr4 v0.0.0-20201029161626-9a95f0cc3d7c h1:j/C2kxPfyE0d87/ggAjIsCV5Cdkqmjb+O0W8W+1J+IY=
 github.com/antlr/antlr4 v0.0.0-20201029161626-9a95f0cc3d7c/go.mod h1:T7PbCXFs94rrTttyxjbyT5+/1V8T2TYDejxUfHJjw1Y=
+github.com/antlr/antlr4 v0.0.0-20201124223952-86610fd4b43e h1:aSVp4kb2j7NHptz8m0r8ymQGyAhYV0kBnGXPym4opqI=
+github.com/antlr/antlr4 v0.0.0-20201124223952-86610fd4b43e/go.mod h1:T7PbCXFs94rrTttyxjbyT5+/1V8T2TYDejxUfHJjw1Y=
 gopkg.in/pipe.v2 v2.0.0-20140414041502-3c2ca4d52544 h1:WJH1qsOB4/zb/li+zLMn0vaAUJ5FqPv6HYLI3aQVg1k=
 gopkg.in/pipe.v2 v2.0.0-20140414041502-3c2ca4d52544/go.mod h1:UhTeH/yXCK/KY7TX24mqPkaQ7gZeqmWd/8SSS8B3aHw=
