@@ -1,18 +1,20 @@
 grammar GShell;
 
 // Tokens
-fragment LETTERS: [\p{Ll}|\p{Lu}]+;
-fragment DIGITS: [\p{Nd}]+;
-fragment INT: '-' DIGITS | DIGITS;
-fragment FLOAT: INT '.' DIGITS;
+fragment LETTER: [\p{Ll}|\p{Lu}];
+fragment DIGIT: [\p{Nd}];
+fragment PUCTUATION: [!?.\-+*&^%$#@~];
+fragment INT: '-' DIGIT+ | DIGIT+;
+fragment FLOAT: INT '.' DIGIT+;
+fragment IDENTIFER_START: LETTER+|PUCTUATION+;
 
-IDENTIFIER: LETTERS DIGITS|LETTERS;
+IDENTIFIER: IDENTIFER_START (DIGIT|IDENTIFER_START)*;
 NUMBER: INT | FLOAT;
 
 TERMINATOR: [;];
 NL: [\n];
 
-WHITESPACE: [ \r\t]+ -> skip;
+WS: [ \r\t]+ -> skip;
 
 // Rules
 start

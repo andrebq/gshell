@@ -61,9 +61,7 @@ func (t Text) Fmt(p Printer) {
 }
 
 func (c *Cmd) Fmt(p Printer) {
-	p.WriteString("[command-name] ")
 	c.command.Fmt(p)
-	p.WriteString(" [command-name]")
 	for _, a := range c.args {
 		if f, ok := a.(Formatter); ok {
 			p.WriteArgSeparator()
@@ -82,6 +80,7 @@ func (s *Script) Fmt(p Printer) {
 	case 1:
 		p.WriteString(" ")
 		s.cmds[0].Fmt(p)
+		p.WriteInlineTerminator()
 		p.WriteString(" }")
 		return
 	default:
@@ -101,6 +100,10 @@ func (s *Script) Fmt(p Printer) {
 }
 
 func (a *Ast) Fmt(p Printer) {
+	if a.root == nil {
+		p.WriteString("{}")
+		return
+	}
 	a.root.Fmt(p)
 }
 
@@ -119,6 +122,7 @@ func (a *Ast) String() string {
 func newAstBuilder() *astBuilder {
 	return &astBuilder{
 		BaseGShellListener: &BaseGShellListener{},
+		ast:                &Ast{},
 	}
 }
 
@@ -129,6 +133,7 @@ func Parse(code string) (*Ast, error) {
 	errorsFound := &errorsListener{
 		ErrorListener: antlr.NewDefaultErrorListener(),
 	}
+	parser.RemoveErrorListeners()
 	parser.AddErrorListener(errorsFound)
 	astBuilder := newAstBuilder()
 	antlr.ParseTreeWalkerDefault.Walk(astBuilder, parser.Start())
@@ -175,7 +180,7 @@ func (ab *astBuilder) ExitSingleCommand(c *SingleCommandContext) {
 
 	cmd.args = make([]interface{}, 0, argst.depth())
 	for !argst.empty() {
-		if len(cmd.args) == 0 {
+		if cmd.command == (Symbol{}) {
 			cmd.command = argst.pop().(Symbol)
 			continue
 		}

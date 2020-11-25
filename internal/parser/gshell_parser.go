@@ -57,7 +57,7 @@ var literalNames = []string{
 	"", "'{'", "'}'",
 }
 var symbolicNames = []string{
-	"", "", "", "IDENTIFIER", "NUMBER", "TERMINATOR", "NL", "WHITESPACE",
+	"", "", "", "IDENTIFIER", "NUMBER", "TERMINATOR", "NL", "WS",
 }
 
 var ruleNames = []string{
@@ -99,7 +99,7 @@ const (
 	GShellParserNUMBER = 4
 	GShellParserTERMINATOR = 5
 	GShellParserNL = 6
-	GShellParserWHITESPACE = 7
+	GShellParserWS = 7
 )
 
 // GShellParser rules.

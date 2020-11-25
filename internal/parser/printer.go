@@ -8,6 +8,7 @@ type (
 		WriteIndent()
 		WriteLineBreak()
 		WriteArgSeparator()
+		WriteInlineTerminator()
 		Indent()
 		Unindent()
 		Err() error
@@ -47,6 +48,10 @@ func (p *printer) WriteIndent() {
 
 func (p *printer) WriteArgSeparator() {
 	p.WriteString(" ")
+}
+
+func (p *printer) WriteInlineTerminator() {
+	p.WriteString(";")
 }
 
 func (p *printer) Err() error {
