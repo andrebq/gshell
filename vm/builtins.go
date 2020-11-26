@@ -15,17 +15,20 @@ var (
 )
 
 func GShellPrintln(c *CallStack) {
-	// TODO: this implementation of println is wrong, but I just want to see
-	// if the function call works
 	parts := make([]string, len(c.RawArgs))
 	for i, a := range c.RawArgs {
-		switch a := a.(type) {
+		v, err := c.VM.Eval(c.Context, a)
+		if err != nil {
+			c.FailWith = err
+			return
+		}
+		switch v := v.(type) {
 		case ast.Symbol:
-			parts[i] = a.Text()
+			parts[i] = v.Text()
 		case ast.Number:
-			parts[i] = strconv.FormatFloat(a.Float64(), 'f', -1, 64)
+			parts[i] = strconv.FormatFloat(v.Float64(), 'f', -1, 64)
 		default:
-			parts[i] = fmt.Sprintf("%v", a)
+			parts[i] = fmt.Sprintf("%v", v)
 		}
 	}
 	c.VM.PushValues(StdoutChannel, c.Context, strings.Join(parts, " ")+"\n")

@@ -28,6 +28,10 @@ type (
 		RawArgs []ast.Argument
 		VM      *VM
 		Context *Context
+
+		// Use to indcate that the function call failed
+		// and give it a reason
+		FailWith error
 	}
 
 	Context struct {
@@ -136,13 +140,13 @@ func (v *VM) callValue(call *CallStack, value Value) error {
 	default:
 		return fmt.Errorf("Value %q is not callable", value)
 	}
-	return nil
+	return call.FailWith
 }
 
 func (v *VM) callBuiltin(call *CallStack, value Process) error {
 	// things like for/if/let must be implemented as builtin
 	value.Run(call)
-	return nil
+	return call.FailWith
 }
 
 func (v *VM) PushValues(chname ast.Symbol, ctx *Context, values ...Value) bool {
@@ -167,7 +171,7 @@ func (v *VM) PushValues(chname ast.Symbol, ctx *Context, values ...Value) bool {
 	return false
 }
 
-func (v *VM) Eval(a ast.Argument) (interface{}, error) {
+func (v *VM) Eval(ctx *Context, a ast.Argument) (interface{}, error) {
 	switch a := a.(type) {
 	case ast.Symbol:
 		return a.Text(), nil
