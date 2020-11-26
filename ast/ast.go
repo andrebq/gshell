@@ -119,6 +119,8 @@ func (a *Ast) Fmt(p Printer) {
 	a.root.Fmt(p)
 }
 
+func (a *Ast) Root() *Script { return a.root }
+
 func (a *Ast) String() string {
 	buf := &bytes.Buffer{}
 	p := &printer{
@@ -168,6 +170,10 @@ func NewSymbol(s string) (Symbol, error) {
 func (s *Script) AddCommand(cmd *Cmd) *Script {
 	s.cmds = append(s.cmds, cmd)
 	return s
+}
+
+func (s *Script) Commands() []*Cmd {
+	return append([]*Cmd(nil), s.cmds...)
 }
 
 func (c *Cmd) SetCommand(s Symbol) *Cmd {
