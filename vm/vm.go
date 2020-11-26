@@ -12,7 +12,6 @@ import (
 type (
 	VM struct {
 		builtins map[ast.Symbol]Process
-		channels map[ast.Symbol]chan Event
 
 		chlock  sync.RWMutex
 		rootCtx *Context
@@ -28,7 +27,7 @@ type (
 	CallStack struct {
 		RawArgs []ast.Argument
 		VM      *VM
-		Context Context
+		Context *Context
 	}
 
 	Context struct {
@@ -64,7 +63,6 @@ func mustSym(s string) ast.Symbol {
 func NewVM() *VM {
 	vm := &VM{
 		builtins: make(map[ast.Symbol]Process),
-		channels: make(map[ast.Symbol]chan Event),
 		rootCtx:  NewContext(nil),
 	}
 	vm.builtins[printlnSym] = ProcessFunc(GShellPrintln)
@@ -75,14 +73,24 @@ func NewVM() *VM {
 	return vm
 }
 
-func (v *VM) GetChannel(chname ast.Symbol) (<-chan Event, error) {
-	v.chlock.RLock()
-	ch, ok := v.channels[chname]
-	v.chlock.RUnlock()
+func (v *VM) Stdout() <-chan Event {
+	return v.getDefaultChannel(StdoutChannel)
+}
+
+func (v *VM) Stderr() <-chan Event {
+	return v.getDefaultChannel(StderrChannel)
+}
+
+func (v *VM) Stdin() chan<- Event {
+	return v.getDefaultChannel(StdinChannel)
+}
+
+func (v *VM) getDefaultChannel(name ast.Symbol) chan Event {
+	ev, ok := v.rootCtx.Get(name)
 	if !ok {
-		return nil, ErrChannelNotFound
+		return nil
 	}
-	return ch, nil
+	return ev.(chan Event)
 }
 
 func (v *VM) Run(code string) error {
@@ -105,28 +113,58 @@ func (v *VM) runScript(ctx *Context, sc *ast.Script) error {
 }
 
 func (v *VM) runCommand(ctx *Context, cmd *ast.Cmd) error {
-	return errors.New("not implemented")
+	call := &CallStack{
+		VM:      v,
+		RawArgs: cmd.Arguments(),
+		Context: ctx,
+	}
+	bt, found := v.builtins[cmd.Command()]
+	if found {
+		return v.callBuiltin(call, bt)
+	}
+	value, found := ctx.Get(cmd.Command())
+	if !found {
+		return fmt.Errorf("Command %v not found", cmd.Command().Text())
+	}
+	return v.callValue(call, value)
 }
 
-func (v *VM) PushValues(chname ast.Symbol, values ...Value) bool {
-	v.chlock.RLock()
-	ch, ok := v.channels[chname]
-	v.chlock.RUnlock()
+func (v *VM) callValue(call *CallStack, value Value) error {
+	switch value := value.(type) {
+	case Process:
+		value.Run(call)
+	default:
+		return fmt.Errorf("Value %q is not callable", value)
+	}
+	return nil
+}
+
+func (v *VM) callBuiltin(call *CallStack, value Process) error {
+	// things like for/if/let must be implemented as builtin
+	value.Run(call)
+	return nil
+}
+
+func (v *VM) PushValues(chname ast.Symbol, ctx *Context, values ...Value) bool {
+	ch, ok := ctx.Get(chname)
 	if !ok {
 		return false
 	}
-	for _, v := range values {
-		// TODO: this is blocking, allow some for of safely closing the VM
-		// even when this operation is going on
-		var ev Event
-		switch v := v.(type) {
-		case Event:
-		default:
-			ev.Main = v
+	if ch, ok := ch.(chan Event); ok {
+		for _, v := range values {
+			// TODO: this is blocking, allow some for of safely closing the VM
+			// even when this operation is going on
+			var ev Event
+			switch v := v.(type) {
+			case Event:
+			default:
+				ev.Main = v
+			}
+			ch <- ev
 		}
-		ch <- ev
+		return true
 	}
-	return true
+	return false
 }
 
 func (v *VM) Eval(a ast.Argument) (interface{}, error) {

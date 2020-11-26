@@ -14,7 +14,7 @@ type (
 
 	Cmd struct {
 		command Symbol
-		args    []interface{}
+		args    []Argument
 	}
 
 	Script struct {
@@ -188,4 +188,8 @@ func (c *Cmd) Command() Symbol {
 func (c *Cmd) AddArgument(a Argument) *Cmd {
 	c.args = append(c.args, a)
 	return c
+}
+
+func (c *Cmd) Arguments() []Argument {
+	return append([]Argument(nil), c.args...)
 }
