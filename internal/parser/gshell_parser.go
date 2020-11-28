@@ -16,43 +16,51 @@ var _ = reflect.Copy
 var _ = strconv.Itoa
 
 var parserATN = []uint16{
-	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 10, 94, 4,
-	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 4,
-	8, 9, 8, 4, 9, 9, 9, 4, 10, 9, 10, 4, 11, 9, 11, 4, 12, 9, 12, 3, 2, 3,
-	2, 3, 2, 3, 3, 3, 3, 3, 4, 7, 4, 31, 10, 4, 12, 4, 14, 4, 34, 11, 4, 3,
-	4, 3, 4, 7, 4, 38, 10, 4, 12, 4, 14, 4, 41, 11, 4, 3, 5, 3, 5, 7, 5, 45,
-	10, 5, 12, 5, 14, 5, 48, 11, 5, 3, 5, 3, 5, 3, 5, 3, 6, 3, 6, 3, 6, 3,
-	7, 3, 7, 3, 7, 3, 7, 5, 7, 60, 10, 7, 3, 8, 3, 8, 3, 9, 3, 9, 7, 9, 66,
-	10, 9, 12, 9, 14, 9, 69, 11, 9, 3, 9, 3, 9, 7, 9, 73, 10, 9, 12, 9, 14,
-	9, 76, 11, 9, 3, 9, 3, 9, 7, 9, 80, 10, 9, 12, 9, 14, 9, 83, 11, 9, 5,
-	9, 85, 10, 9, 3, 10, 3, 10, 3, 11, 3, 11, 3, 12, 3, 12, 3, 12, 3, 12, 2,
-	2, 13, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 2, 3, 3, 2, 8, 9, 2, 91,
-	2, 24, 3, 2, 2, 2, 4, 27, 3, 2, 2, 2, 6, 32, 3, 2, 2, 2, 8, 42, 3, 2, 2,
-	2, 10, 52, 3, 2, 2, 2, 12, 59, 3, 2, 2, 2, 14, 61, 3, 2, 2, 2, 16, 84,
-	3, 2, 2, 2, 18, 86, 3, 2, 2, 2, 20, 88, 3, 2, 2, 2, 22, 90, 3, 2, 2, 2,
-	24, 25, 5, 8, 5, 2, 25, 26, 7, 2, 2, 3, 26, 3, 3, 2, 2, 2, 27, 28, 9, 2,
-	2, 2, 28, 5, 3, 2, 2, 2, 29, 31, 7, 9, 2, 2, 30, 29, 3, 2, 2, 2, 31, 34,
-	3, 2, 2, 2, 32, 30, 3, 2, 2, 2, 32, 33, 3, 2, 2, 2, 33, 35, 3, 2, 2, 2,
-	34, 32, 3, 2, 2, 2, 35, 39, 5, 10, 6, 2, 36, 38, 7, 9, 2, 2, 37, 36, 3,
-	2, 2, 2, 38, 41, 3, 2, 2, 2, 39, 37, 3, 2, 2, 2, 39, 40, 3, 2, 2, 2, 40,
-	7, 3, 2, 2, 2, 41, 39, 3, 2, 2, 2, 42, 46, 7, 3, 2, 2, 43, 45, 5, 6, 4,
-	2, 44, 43, 3, 2, 2, 2, 45, 48, 3, 2, 2, 2, 46, 44, 3, 2, 2, 2, 46, 47,
-	3, 2, 2, 2, 47, 49, 3, 2, 2, 2, 48, 46, 3, 2, 2, 2, 49, 50, 7, 4, 2, 2,
-	50, 51, 7, 2, 2, 3, 51, 9, 3, 2, 2, 2, 52, 53, 5, 12, 7, 2, 53, 54, 5,
-	4, 3, 2, 54, 11, 3, 2, 2, 2, 55, 60, 5, 14, 8, 2, 56, 57, 5, 14, 8, 2,
-	57, 58, 5, 16, 9, 2, 58, 60, 3, 2, 2, 2, 59, 55, 3, 2, 2, 2, 59, 56, 3,
-	2, 2, 2, 60, 13, 3, 2, 2, 2, 61, 62, 7, 6, 2, 2, 62, 15, 3, 2, 2, 2, 63,
-	67, 5, 18, 10, 2, 64, 66, 5, 16, 9, 2, 65, 64, 3, 2, 2, 2, 66, 69, 3, 2,
-	2, 2, 67, 65, 3, 2, 2, 2, 67, 68, 3, 2, 2, 2, 68, 85, 3, 2, 2, 2, 69, 67,
-	3, 2, 2, 2, 70, 74, 5, 20, 11, 2, 71, 73, 5, 16, 9, 2, 72, 71, 3, 2, 2,
-	2, 73, 76, 3, 2, 2, 2, 74, 72, 3, 2, 2, 2, 74, 75, 3, 2, 2, 2, 75, 85,
-	3, 2, 2, 2, 76, 74, 3, 2, 2, 2, 77, 81, 5, 22, 12, 2, 78, 80, 5, 16, 9,
-	2, 79, 78, 3, 2, 2, 2, 80, 83, 3, 2, 2, 2, 81, 79, 3, 2, 2, 2, 81, 82,
-	3, 2, 2, 2, 82, 85, 3, 2, 2, 2, 83, 81, 3, 2, 2, 2, 84, 63, 3, 2, 2, 2,
-	84, 70, 3, 2, 2, 2, 84, 77, 3, 2, 2, 2, 85, 17, 3, 2, 2, 2, 86, 87, 7,
-	6, 2, 2, 87, 19, 3, 2, 2, 2, 88, 89, 7, 7, 2, 2, 89, 21, 3, 2, 2, 2, 90,
-	91, 7, 5, 2, 2, 91, 92, 7, 6, 2, 2, 92, 23, 3, 2, 2, 2, 10, 32, 39, 46,
-	59, 67, 74, 81, 84,
+	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 10, 112,
+	4, 2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7,
+	4, 8, 9, 8, 4, 9, 9, 9, 4, 10, 9, 10, 4, 11, 9, 11, 4, 12, 9, 12, 4, 13,
+	9, 13, 3, 2, 3, 2, 3, 2, 3, 3, 3, 3, 3, 4, 7, 4, 33, 10, 4, 12, 4, 14,
+	4, 36, 11, 4, 3, 4, 3, 4, 7, 4, 40, 10, 4, 12, 4, 14, 4, 43, 11, 4, 3,
+	5, 3, 5, 7, 5, 47, 10, 5, 12, 5, 14, 5, 50, 11, 5, 3, 5, 3, 5, 3, 5, 3,
+	6, 3, 6, 3, 6, 3, 7, 3, 7, 3, 7, 3, 7, 5, 7, 62, 10, 7, 3, 8, 3, 8, 3,
+	9, 3, 9, 7, 9, 68, 10, 9, 12, 9, 14, 9, 71, 11, 9, 3, 9, 3, 9, 7, 9, 75,
+	10, 9, 12, 9, 14, 9, 78, 11, 9, 3, 9, 3, 9, 7, 9, 82, 10, 9, 12, 9, 14,
+	9, 85, 11, 9, 3, 9, 3, 9, 7, 9, 89, 10, 9, 12, 9, 14, 9, 92, 11, 9, 5,
+	9, 94, 10, 9, 3, 10, 3, 10, 3, 11, 3, 11, 3, 12, 3, 12, 3, 12, 3, 13, 3,
+	13, 7, 13, 105, 10, 13, 12, 13, 14, 13, 108, 11, 13, 3, 13, 3, 13, 3, 13,
+	2, 2, 14, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 2, 3, 3, 2, 8, 9,
+	2, 111, 2, 26, 3, 2, 2, 2, 4, 29, 3, 2, 2, 2, 6, 34, 3, 2, 2, 2, 8, 44,
+	3, 2, 2, 2, 10, 54, 3, 2, 2, 2, 12, 61, 3, 2, 2, 2, 14, 63, 3, 2, 2, 2,
+	16, 93, 3, 2, 2, 2, 18, 95, 3, 2, 2, 2, 20, 97, 3, 2, 2, 2, 22, 99, 3,
+	2, 2, 2, 24, 102, 3, 2, 2, 2, 26, 27, 5, 8, 5, 2, 27, 28, 7, 2, 2, 3, 28,
+	3, 3, 2, 2, 2, 29, 30, 9, 2, 2, 2, 30, 5, 3, 2, 2, 2, 31, 33, 7, 9, 2,
+	2, 32, 31, 3, 2, 2, 2, 33, 36, 3, 2, 2, 2, 34, 32, 3, 2, 2, 2, 34, 35,
+	3, 2, 2, 2, 35, 37, 3, 2, 2, 2, 36, 34, 3, 2, 2, 2, 37, 41, 5, 10, 6, 2,
+	38, 40, 7, 9, 2, 2, 39, 38, 3, 2, 2, 2, 40, 43, 3, 2, 2, 2, 41, 39, 3,
+	2, 2, 2, 41, 42, 3, 2, 2, 2, 42, 7, 3, 2, 2, 2, 43, 41, 3, 2, 2, 2, 44,
+	48, 7, 3, 2, 2, 45, 47, 5, 6, 4, 2, 46, 45, 3, 2, 2, 2, 47, 50, 3, 2, 2,
+	2, 48, 46, 3, 2, 2, 2, 48, 49, 3, 2, 2, 2, 49, 51, 3, 2, 2, 2, 50, 48,
+	3, 2, 2, 2, 51, 52, 7, 4, 2, 2, 52, 53, 7, 2, 2, 3, 53, 9, 3, 2, 2, 2,
+	54, 55, 5, 12, 7, 2, 55, 56, 5, 4, 3, 2, 56, 11, 3, 2, 2, 2, 57, 62, 5,
+	14, 8, 2, 58, 59, 5, 14, 8, 2, 59, 60, 5, 16, 9, 2, 60, 62, 3, 2, 2, 2,
+	61, 57, 3, 2, 2, 2, 61, 58, 3, 2, 2, 2, 62, 13, 3, 2, 2, 2, 63, 64, 7,
+	6, 2, 2, 64, 15, 3, 2, 2, 2, 65, 69, 5, 18, 10, 2, 66, 68, 5, 16, 9, 2,
+	67, 66, 3, 2, 2, 2, 68, 71, 3, 2, 2, 2, 69, 67, 3, 2, 2, 2, 69, 70, 3,
+	2, 2, 2, 70, 94, 3, 2, 2, 2, 71, 69, 3, 2, 2, 2, 72, 76, 5, 20, 11, 2,
+	73, 75, 5, 16, 9, 2, 74, 73, 3, 2, 2, 2, 75, 78, 3, 2, 2, 2, 76, 74, 3,
+	2, 2, 2, 76, 77, 3, 2, 2, 2, 77, 94, 3, 2, 2, 2, 78, 76, 3, 2, 2, 2, 79,
+	83, 5, 22, 12, 2, 80, 82, 5, 16, 9, 2, 81, 80, 3, 2, 2, 2, 82, 85, 3, 2,
+	2, 2, 83, 81, 3, 2, 2, 2, 83, 84, 3, 2, 2, 2, 84, 94, 3, 2, 2, 2, 85, 83,
+	3, 2, 2, 2, 86, 90, 5, 24, 13, 2, 87, 89, 5, 16, 9, 2, 88, 87, 3, 2, 2,
+	2, 89, 92, 3, 2, 2, 2, 90, 88, 3, 2, 2, 2, 90, 91, 3, 2, 2, 2, 91, 94,
+	3, 2, 2, 2, 92, 90, 3, 2, 2, 2, 93, 65, 3, 2, 2, 2, 93, 72, 3, 2, 2, 2,
+	93, 79, 3, 2, 2, 2, 93, 86, 3, 2, 2, 2, 94, 17, 3, 2, 2, 2, 95, 96, 7,
+	6, 2, 2, 96, 19, 3, 2, 2, 2, 97, 98, 7, 7, 2, 2, 98, 21, 3, 2, 2, 2, 99,
+	100, 7, 5, 2, 2, 100, 101, 7, 6, 2, 2, 101, 23, 3, 2, 2, 2, 102, 106, 7,
+	3, 2, 2, 103, 105, 5, 6, 4, 2, 104, 103, 3, 2, 2, 2, 105, 108, 3, 2, 2,
+	2, 106, 104, 3, 2, 2, 2, 106, 107, 3, 2, 2, 2, 107, 109, 3, 2, 2, 2, 108,
+	106, 3, 2, 2, 2, 109, 110, 7, 4, 2, 2, 110, 25, 3, 2, 2, 2, 12, 34, 41,
+	48, 61, 69, 76, 83, 90, 93, 106,
 }
 var deserializer = antlr.NewATNDeserializer(nil)
 var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
@@ -67,6 +75,7 @@ var symbolicNames = []string{
 var ruleNames = []string{
 	"start", "terminator", "commandListItem", "script", "singleCommand", "commandLine",
 	"commandName", "arguments", "namedArgument", "numericArgument", "variableArgument",
+	"scriptArgument",
 }
 var decisionToDFA = make([]*antlr.DFA, len(deserializedATN.DecisionToState))
 
@@ -120,6 +129,7 @@ const (
 	GShellParserRULE_namedArgument    = 8
 	GShellParserRULE_numericArgument  = 9
 	GShellParserRULE_variableArgument = 10
+	GShellParserRULE_scriptArgument   = 11
 )
 
 // IStartContext is an interface to support dynamic dispatch.
@@ -216,11 +226,11 @@ func (p *GShellParser) Start() (localctx IStartContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(22)
+		p.SetState(24)
 		p.Script()
 	}
 	{
-		p.SetState(23)
+		p.SetState(25)
 		p.Match(GShellParserEOF)
 	}
 
@@ -316,7 +326,7 @@ func (p *GShellParser) Terminator() (localctx ITerminatorContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(25)
+		p.SetState(27)
 		_la = p.GetTokenStream().LA(1)
 
 		if !(_la == GShellParserTERMINATOR || _la == GShellParserNL) {
@@ -430,37 +440,37 @@ func (p *GShellParser) CommandListItem() (localctx ICommandListItemContext) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(30)
+	p.SetState(32)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	for _la == GShellParserNL {
 		{
-			p.SetState(27)
+			p.SetState(29)
 			p.Match(GShellParserNL)
 		}
 
-		p.SetState(32)
+		p.SetState(34)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(33)
+		p.SetState(35)
 		p.SingleCommand()
 	}
-	p.SetState(37)
+	p.SetState(39)
 	p.GetErrorHandler().Sync(p)
 	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext())
 
 	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
 		if _alt == 1 {
 			{
-				p.SetState(34)
+				p.SetState(36)
 				p.Match(GShellParserNL)
 			}
 
 		}
-		p.SetState(39)
+		p.SetState(41)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext())
 	}
@@ -576,29 +586,29 @@ func (p *GShellParser) Script() (localctx IScriptContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(40)
+		p.SetState(42)
 		p.Match(GShellParserT__0)
 	}
-	p.SetState(44)
+	p.SetState(46)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	for _la == GShellParserIDENTIFIER || _la == GShellParserNL {
 		{
-			p.SetState(41)
+			p.SetState(43)
 			p.CommandListItem()
 		}
 
-		p.SetState(46)
+		p.SetState(48)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(47)
+		p.SetState(49)
 		p.Match(GShellParserT__1)
 	}
 	{
-		p.SetState(48)
+		p.SetState(50)
 		p.Match(GShellParserEOF)
 	}
 
@@ -705,11 +715,11 @@ func (p *GShellParser) SingleCommand() (localctx ISingleCommandContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(50)
+		p.SetState(52)
 		p.CommandLine()
 	}
 	{
-		p.SetState(51)
+		p.SetState(53)
 		p.Terminator()
 	}
 
@@ -814,24 +824,24 @@ func (p *GShellParser) CommandLine() (localctx ICommandLineContext) {
 		}
 	}()
 
-	p.SetState(57)
+	p.SetState(59)
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 3, p.GetParserRuleContext()) {
 	case 1:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(53)
+			p.SetState(55)
 			p.CommandName()
 		}
 
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(54)
+			p.SetState(56)
 			p.CommandName()
 		}
 		{
-			p.SetState(55)
+			p.SetState(57)
 			p.Arguments()
 		}
 
@@ -924,7 +934,7 @@ func (p *GShellParser) CommandName() (localctx ICommandNameContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(59)
+		p.SetState(61)
 		p.Match(GShellParserIDENTIFIER)
 	}
 
@@ -1022,6 +1032,16 @@ func (s *ArgumentsContext) VariableArgument() IVariableArgumentContext {
 	return t.(IVariableArgumentContext)
 }
 
+func (s *ArgumentsContext) ScriptArgument() IScriptArgumentContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IScriptArgumentContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IScriptArgumentContext)
+}
+
 func (s *ArgumentsContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
@@ -1064,29 +1084,29 @@ func (p *GShellParser) Arguments() (localctx IArgumentsContext) {
 
 	var _alt int
 
-	p.SetState(82)
+	p.SetState(91)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
 	case GShellParserIDENTIFIER:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(61)
+			p.SetState(63)
 			p.NamedArgument()
 		}
-		p.SetState(65)
+		p.SetState(67)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 4, p.GetParserRuleContext())
 
 		for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
 			if _alt == 1 {
 				{
-					p.SetState(62)
+					p.SetState(64)
 					p.Arguments()
 				}
 
 			}
-			p.SetState(67)
+			p.SetState(69)
 			p.GetErrorHandler().Sync(p)
 			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 4, p.GetParserRuleContext())
 		}
@@ -1094,22 +1114,22 @@ func (p *GShellParser) Arguments() (localctx IArgumentsContext) {
 	case GShellParserNUMBER:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(68)
+			p.SetState(70)
 			p.NumericArgument()
 		}
-		p.SetState(72)
+		p.SetState(74)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 5, p.GetParserRuleContext())
 
 		for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
 			if _alt == 1 {
 				{
-					p.SetState(69)
+					p.SetState(71)
 					p.Arguments()
 				}
 
 			}
-			p.SetState(74)
+			p.SetState(76)
 			p.GetErrorHandler().Sync(p)
 			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 5, p.GetParserRuleContext())
 		}
@@ -1117,24 +1137,47 @@ func (p *GShellParser) Arguments() (localctx IArgumentsContext) {
 	case GShellParserT__2:
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(75)
+			p.SetState(77)
 			p.VariableArgument()
 		}
-		p.SetState(79)
+		p.SetState(81)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 6, p.GetParserRuleContext())
 
 		for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
 			if _alt == 1 {
 				{
-					p.SetState(76)
+					p.SetState(78)
 					p.Arguments()
 				}
 
 			}
-			p.SetState(81)
+			p.SetState(83)
 			p.GetErrorHandler().Sync(p)
 			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 6, p.GetParserRuleContext())
+		}
+
+	case GShellParserT__0:
+		p.EnterOuterAlt(localctx, 4)
+		{
+			p.SetState(84)
+			p.ScriptArgument()
+		}
+		p.SetState(88)
+		p.GetErrorHandler().Sync(p)
+		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 7, p.GetParserRuleContext())
+
+		for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
+			if _alt == 1 {
+				{
+					p.SetState(85)
+					p.Arguments()
+				}
+
+			}
+			p.SetState(90)
+			p.GetErrorHandler().Sync(p)
+			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 7, p.GetParserRuleContext())
 		}
 
 	default:
@@ -1228,7 +1271,7 @@ func (p *GShellParser) NamedArgument() (localctx INamedArgumentContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(84)
+		p.SetState(93)
 		p.Match(GShellParserIDENTIFIER)
 	}
 
@@ -1319,7 +1362,7 @@ func (p *GShellParser) NumericArgument() (localctx INumericArgumentContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(86)
+		p.SetState(95)
 		p.Match(GShellParserNUMBER)
 	}
 
@@ -1410,12 +1453,141 @@ func (p *GShellParser) VariableArgument() (localctx IVariableArgumentContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(88)
+		p.SetState(97)
 		p.Match(GShellParserT__2)
 	}
 	{
-		p.SetState(89)
+		p.SetState(98)
 		p.Match(GShellParserIDENTIFIER)
+	}
+
+	return localctx
+}
+
+// IScriptArgumentContext is an interface to support dynamic dispatch.
+type IScriptArgumentContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// IsScriptArgumentContext differentiates from other interfaces.
+	IsScriptArgumentContext()
+}
+
+type ScriptArgumentContext struct {
+	*antlr.BaseParserRuleContext
+	parser antlr.Parser
+}
+
+func NewEmptyScriptArgumentContext() *ScriptArgumentContext {
+	var p = new(ScriptArgumentContext)
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
+	p.RuleIndex = GShellParserRULE_scriptArgument
+	return p
+}
+
+func (*ScriptArgumentContext) IsScriptArgumentContext() {}
+
+func NewScriptArgumentContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ScriptArgumentContext {
+	var p = new(ScriptArgumentContext)
+
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
+
+	p.parser = parser
+	p.RuleIndex = GShellParserRULE_scriptArgument
+
+	return p
+}
+
+func (s *ScriptArgumentContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *ScriptArgumentContext) AllCommandListItem() []ICommandListItemContext {
+	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*ICommandListItemContext)(nil)).Elem())
+	var tst = make([]ICommandListItemContext, len(ts))
+
+	for i, t := range ts {
+		if t != nil {
+			tst[i] = t.(ICommandListItemContext)
+		}
+	}
+
+	return tst
+}
+
+func (s *ScriptArgumentContext) CommandListItem(i int) ICommandListItemContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*ICommandListItemContext)(nil)).Elem(), i)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(ICommandListItemContext)
+}
+
+func (s *ScriptArgumentContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ScriptArgumentContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+func (s *ScriptArgumentContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(GShellListener); ok {
+		listenerT.EnterScriptArgument(s)
+	}
+}
+
+func (s *ScriptArgumentContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(GShellListener); ok {
+		listenerT.ExitScriptArgument(s)
+	}
+}
+
+func (p *GShellParser) ScriptArgument() (localctx IScriptArgumentContext) {
+	localctx = NewScriptArgumentContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 22, GShellParserRULE_scriptArgument)
+	var _la int
+
+	defer func() {
+		p.ExitRule()
+	}()
+
+	defer func() {
+		if err := recover(); err != nil {
+			if v, ok := err.(antlr.RecognitionException); ok {
+				localctx.SetException(v)
+				p.GetErrorHandler().ReportError(p, v)
+				p.GetErrorHandler().Recover(p, v)
+			} else {
+				panic(err)
+			}
+		}
+	}()
+
+	p.EnterOuterAlt(localctx, 1)
+	{
+		p.SetState(100)
+		p.Match(GShellParserT__0)
+	}
+	p.SetState(104)
+	p.GetErrorHandler().Sync(p)
+	_la = p.GetTokenStream().LA(1)
+
+	for _la == GShellParserIDENTIFIER || _la == GShellParserNL {
+		{
+			p.SetState(101)
+			p.CommandListItem()
+		}
+
+		p.SetState(106)
+		p.GetErrorHandler().Sync(p)
+		_la = p.GetTokenStream().LA(1)
+	}
+	{
+		p.SetState(107)
+		p.Match(GShellParserT__1)
 	}
 
 	return localctx

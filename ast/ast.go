@@ -123,6 +123,8 @@ func (s *Script) Fmt(p Printer) {
 	}
 }
 
+func (s *Script) anchor() {}
+
 func (a *Ast) Fmt(p Printer) {
 	if a.root == nil {
 		p.WriteString("{}")

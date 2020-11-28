@@ -86,3 +86,9 @@ func (s *BaseGShellListener) EnterVariableArgument(ctx *VariableArgumentContext)
 
 // ExitVariableArgument is called when production variableArgument is exited.
 func (s *BaseGShellListener) ExitVariableArgument(ctx *VariableArgumentContext) {}
+
+// EnterScriptArgument is called when production scriptArgument is entered.
+func (s *BaseGShellListener) EnterScriptArgument(ctx *ScriptArgumentContext) {}
+
+// ExitScriptArgument is called when production scriptArgument is exited.
+func (s *BaseGShellListener) ExitScriptArgument(ctx *ScriptArgumentContext) {}

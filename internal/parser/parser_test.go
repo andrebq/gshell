@@ -28,6 +28,8 @@ var (
 			fmt: "{ echo-1! should.be.valid; }"},
 		{subject: "can use variables as arguments", code: "{println $variable; }",
 			fmt: "{ println $variable; }"},
+		{subject: "can use blocks as arguments", code: "{ if true { println false; } else { println true; }; }",
+			fmt: "{ if true { println false; } else { println true; }; }"},
 	}
 )
 
