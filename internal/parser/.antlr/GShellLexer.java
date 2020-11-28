@@ -1,4 +1,4 @@
-// Generated from c:\Users\andre\Source\github.com\andrebq\gshell\internal\parser\gshell.g4 by ANTLR 4.8
+// Generated from c:\Users\andre\Source\github.com\andrebq\gshell\internal\parser\GShell.g4 by ANTLR 4.8
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -16,7 +16,7 @@ public class GShellLexer extends Lexer {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, IDENTIFIER=3, NUMBER=4, TERMINATOR=5, NL=6, WS=7;
+		T__0=1, T__1=2, T__2=3, IDENTIFIER=4, NUMBER=5, TERMINATOR=6, NL=7, WS=8;
 	public static String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 	};
@@ -27,21 +27,22 @@ public class GShellLexer extends Lexer {
 
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"T__0", "T__1", "LETTER", "DIGIT", "PUCTUATION", "INT", "FLOAT", "IDENTIFER_START", 
-			"IDENTIFIER", "NUMBER", "TERMINATOR", "NL", "WS"
+			"T__0", "T__1", "T__2", "LETTER", "DIGIT", "PUNCTUATION_HEAD", "PUCTUATION_TAIL", 
+			"INT", "FLOAT", "IDENTIFER_START", "IDENTIFIER_TAIL", "IDENTIFIER", "NUMBER", 
+			"TERMINATOR", "NL", "WS"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'{'", "'}'"
+			null, "'{'", "'}'", "'$'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, "IDENTIFIER", "NUMBER", "TERMINATOR", "NL", "WS"
+			null, null, null, null, "IDENTIFIER", "NUMBER", "TERMINATOR", "NL", "WS"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -85,7 +86,7 @@ public class GShellLexer extends Lexer {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "gshell.g4"; }
+	public String getGrammarFileName() { return "GShell.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -103,17 +104,18 @@ public class GShellLexer extends Lexer {
 	public ATN getATN() { return _ATN; }
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2\t^\b\1\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2\nf\b\1\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
-		"\13\4\f\t\f\4\r\t\r\4\16\t\16\3\2\3\2\3\3\3\3\3\4\3\4\3\5\3\5\3\6\3\6"+
-		"\3\7\3\7\6\7*\n\7\r\7\16\7+\3\7\6\7/\n\7\r\7\16\7\60\5\7\63\n\7\3\b\3"+
-		"\b\3\b\6\b8\n\b\r\b\16\b9\3\t\6\t=\n\t\r\t\16\t>\3\t\6\tB\n\t\r\t\16\t"+
-		"C\5\tF\n\t\3\n\3\n\3\n\7\nK\n\n\f\n\16\nN\13\n\3\13\3\13\5\13R\n\13\3"+
-		"\f\3\f\3\r\3\r\3\16\6\16Y\n\16\r\16\16\16Z\3\16\3\16\2\2\17\3\3\5\4\7"+
-		"\2\t\2\13\2\r\2\17\2\21\2\23\5\25\6\27\7\31\b\33\t\3\2\6\t\2##%(,-/\60"+
-		"AB``\u0080\u0080\3\2==\3\2\f\f\5\2\13\13\17\17\"\"\4\u0088\2C\2\\\2c\2"+
-		"|\2~\2~\2\u00b7\2\u00b7\2\u00c2\2\u00d8\2\u00da\2\u00f8\2\u00fa\2\u01bc"+
-		"\2\u01be\2\u01c1\2\u01c6\2\u01c6\2\u01c8\2\u01c9\2\u01cb\2\u01cc\2\u01ce"+
+		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\3\2\3\2\3"+
+		"\3\3\3\3\4\3\4\3\5\3\5\3\6\3\6\3\7\3\7\3\b\3\b\5\b\62\n\b\3\t\3\t\6\t"+
+		"\66\n\t\r\t\16\t\67\3\t\6\t;\n\t\r\t\16\t<\5\t?\n\t\3\n\3\n\3\n\6\nD\n"+
+		"\n\r\n\16\nE\3\13\3\13\5\13J\n\13\3\f\3\f\3\f\5\fO\n\f\3\r\3\r\7\rS\n"+
+		"\r\f\r\16\rV\13\r\3\16\3\16\5\16Z\n\16\3\17\3\17\3\20\3\20\3\21\6\21a"+
+		"\n\21\r\21\16\21b\3\21\3\21\2\2\22\3\3\5\4\7\5\t\2\13\2\r\2\17\2\21\2"+
+		"\23\2\25\2\27\2\31\6\33\7\35\b\37\t!\n\3\2\7\n\2##%%\'(,-/\60AB``\u0080"+
+		"\u0080\3\2&&\3\2==\3\2\f\f\5\2\13\13\17\17\"\"\4\u0088\2C\2\\\2c\2|\2"+
+		"~\2~\2\u00b7\2\u00b7\2\u00c2\2\u00d8\2\u00da\2\u00f8\2\u00fa\2\u01bc\2"+
+		"\u01be\2\u01c1\2\u01c6\2\u01c6\2\u01c8\2\u01c9\2\u01cb\2\u01cc\2\u01ce"+
 		"\2\u01f3\2\u01f5\2\u0295\2\u0297\2\u02b1\2\u0372\2\u0375\2\u0378\2\u0379"+
 		"\2\u037d\2\u037f\2\u0381\2\u0381\2\u0388\2\u0388\2\u038a\2\u038c\2\u038e"+
 		"\2\u038e\2\u0390\2\u03a3\2\u03a5\2\u03f7\2\u03f9\2\u0483\2\u048c\2\u0531"+
@@ -153,23 +155,24 @@ public class GShellLexer extends Lexer {
 		"\3\u10fb\3\u1138\3\u1141\3\u11d2\3\u11db\3\u12f2\3\u12fb\3\u1452\3\u145b"+
 		"\3\u14d2\3\u14db\3\u1652\3\u165b\3\u16c2\3\u16cb\3\u1732\3\u173b\3\u18e2"+
 		"\3\u18eb\3\u1c52\3\u1c5b\3\u1d52\3\u1d5b\3\u6a62\3\u6a6b\3\u6b52\3\u6b5b"+
-		"\3\ud7d0\3\ud801\3\ue952\3\ue95b\3b\2\3\3\2\2\2\2\5\3\2\2\2\2\23\3\2\2"+
-		"\2\2\25\3\2\2\2\2\27\3\2\2\2\2\31\3\2\2\2\2\33\3\2\2\2\3\35\3\2\2\2\5"+
-		"\37\3\2\2\2\7!\3\2\2\2\t#\3\2\2\2\13%\3\2\2\2\r\62\3\2\2\2\17\64\3\2\2"+
-		"\2\21E\3\2\2\2\23G\3\2\2\2\25Q\3\2\2\2\27S\3\2\2\2\31U\3\2\2\2\33X\3\2"+
-		"\2\2\35\36\7}\2\2\36\4\3\2\2\2\37 \7\177\2\2 \6\3\2\2\2!\"\t\6\2\2\"\b"+
-		"\3\2\2\2#$\t\7\2\2$\n\3\2\2\2%&\t\2\2\2&\f\3\2\2\2\')\7/\2\2(*\5\t\5\2"+
-		")(\3\2\2\2*+\3\2\2\2+)\3\2\2\2+,\3\2\2\2,\63\3\2\2\2-/\5\t\5\2.-\3\2\2"+
-		"\2/\60\3\2\2\2\60.\3\2\2\2\60\61\3\2\2\2\61\63\3\2\2\2\62\'\3\2\2\2\62"+
-		".\3\2\2\2\63\16\3\2\2\2\64\65\5\r\7\2\65\67\7\60\2\2\668\5\t\5\2\67\66"+
-		"\3\2\2\289\3\2\2\29\67\3\2\2\29:\3\2\2\2:\20\3\2\2\2;=\5\7\4\2<;\3\2\2"+
-		"\2=>\3\2\2\2><\3\2\2\2>?\3\2\2\2?F\3\2\2\2@B\5\13\6\2A@\3\2\2\2BC\3\2"+
-		"\2\2CA\3\2\2\2CD\3\2\2\2DF\3\2\2\2E<\3\2\2\2EA\3\2\2\2F\22\3\2\2\2GL\5"+
-		"\21\t\2HK\5\t\5\2IK\5\21\t\2JH\3\2\2\2JI\3\2\2\2KN\3\2\2\2LJ\3\2\2\2L"+
-		"M\3\2\2\2M\24\3\2\2\2NL\3\2\2\2OR\5\r\7\2PR\5\17\b\2QO\3\2\2\2QP\3\2\2"+
-		"\2R\26\3\2\2\2ST\t\3\2\2T\30\3\2\2\2UV\t\4\2\2V\32\3\2\2\2WY\t\5\2\2X"+
-		"W\3\2\2\2YZ\3\2\2\2ZX\3\2\2\2Z[\3\2\2\2[\\\3\2\2\2\\]\b\16\2\2]\34\3\2"+
-		"\2\2\16\2+\60\629>CEJLQZ\3\b\2\2";
+		"\3\ud7d0\3\ud801\3\ue952\3\ue95b\3h\2\3\3\2\2\2\2\5\3\2\2\2\2\7\3\2\2"+
+		"\2\2\31\3\2\2\2\2\33\3\2\2\2\2\35\3\2\2\2\2\37\3\2\2\2\2!\3\2\2\2\3#\3"+
+		"\2\2\2\5%\3\2\2\2\7\'\3\2\2\2\t)\3\2\2\2\13+\3\2\2\2\r-\3\2\2\2\17\61"+
+		"\3\2\2\2\21>\3\2\2\2\23@\3\2\2\2\25I\3\2\2\2\27N\3\2\2\2\31P\3\2\2\2\33"+
+		"Y\3\2\2\2\35[\3\2\2\2\37]\3\2\2\2!`\3\2\2\2#$\7}\2\2$\4\3\2\2\2%&\7\177"+
+		"\2\2&\6\3\2\2\2\'(\7&\2\2(\b\3\2\2\2)*\t\7\2\2*\n\3\2\2\2+,\t\b\2\2,\f"+
+		"\3\2\2\2-.\t\2\2\2.\16\3\2\2\2/\62\5\r\7\2\60\62\t\3\2\2\61/\3\2\2\2\61"+
+		"\60\3\2\2\2\62\20\3\2\2\2\63\65\7/\2\2\64\66\5\13\6\2\65\64\3\2\2\2\66"+
+		"\67\3\2\2\2\67\65\3\2\2\2\678\3\2\2\28?\3\2\2\29;\5\13\6\2:9\3\2\2\2;"+
+		"<\3\2\2\2<:\3\2\2\2<=\3\2\2\2=?\3\2\2\2>\63\3\2\2\2>:\3\2\2\2?\22\3\2"+
+		"\2\2@A\5\21\t\2AC\7\60\2\2BD\5\13\6\2CB\3\2\2\2DE\3\2\2\2EC\3\2\2\2EF"+
+		"\3\2\2\2F\24\3\2\2\2GJ\5\t\5\2HJ\5\r\7\2IG\3\2\2\2IH\3\2\2\2J\26\3\2\2"+
+		"\2KO\5\13\6\2LO\5\t\5\2MO\5\17\b\2NK\3\2\2\2NL\3\2\2\2NM\3\2\2\2O\30\3"+
+		"\2\2\2PT\5\25\13\2QS\5\27\f\2RQ\3\2\2\2SV\3\2\2\2TR\3\2\2\2TU\3\2\2\2"+
+		"U\32\3\2\2\2VT\3\2\2\2WZ\5\21\t\2XZ\5\23\n\2YW\3\2\2\2YX\3\2\2\2Z\34\3"+
+		"\2\2\2[\\\t\4\2\2\\\36\3\2\2\2]^\t\5\2\2^ \3\2\2\2_a\t\6\2\2`_\3\2\2\2"+
+		"ab\3\2\2\2b`\3\2\2\2bc\3\2\2\2cd\3\2\2\2de\b\21\2\2e\"\3\2\2\2\r\2\61"+
+		"\67<>EINTYb\3\b\2\2";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

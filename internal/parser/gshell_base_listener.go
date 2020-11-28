@@ -80,3 +80,9 @@ func (s *BaseGShellListener) EnterNumericArgument(ctx *NumericArgumentContext) {
 
 // ExitNumericArgument is called when production numericArgument is exited.
 func (s *BaseGShellListener) ExitNumericArgument(ctx *NumericArgumentContext) {}
+
+// EnterVariableArgument is called when production variableArgument is entered.
+func (s *BaseGShellListener) EnterVariableArgument(ctx *VariableArgumentContext) {}
+
+// ExitVariableArgument is called when production variableArgument is exited.
+func (s *BaseGShellListener) ExitVariableArgument(ctx *VariableArgumentContext) {}

@@ -89,6 +89,7 @@ func (ab *astBuilder) ExitSingleCommand(c *SingleCommandContext) {
 	for !argst.empty() {
 		if cmd.Command() == (ast.Symbol{}) {
 			cmd.SetCommand(argst.pop().(ast.Symbol))
+			continue
 		}
 		cmd.AddArgument(argst.pop().(ast.Argument))
 	}
@@ -121,6 +122,15 @@ func (ab *astBuilder) ExitNamedArgument(c *NamedArgumentContext) {
 		s, _ = ast.NewSymbol("error-invalid-symbol")
 	}
 	ab.stack.push(s)
+}
+
+func (ab *astBuilder) ExitVariableArgument(c *VariableArgumentContext) {
+	v, err := ast.NewVarString(c.GetText()[1:])
+	if err != nil {
+		ab.err = fmt.Errorf("string %q could not be cast to ast.Symbol. cause: %v", c.GetText(), err)
+		v, _ = ast.NewVarString("error-invalid-variable")
+	}
+	ab.stack.push(v)
 }
 
 func (s *stack) push(v interface{}) {

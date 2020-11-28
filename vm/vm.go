@@ -48,6 +48,7 @@ type (
 
 var (
 	printlnSym = mustSym("println")
+	letSym     = mustSym("let")
 
 	ErrChannelNotFound = errors.New("channel not found")
 )
@@ -70,6 +71,7 @@ func NewVM() *VM {
 		rootCtx:  NewContext(nil),
 	}
 	vm.builtins[printlnSym] = ProcessFunc(GShellPrintln)
+	vm.builtins[letSym] = ProcessFunc(GShellLetVariable)
 	const defaultChanSize = 1000
 	vm.rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))
 	vm.rootCtx.Set(StdinChannel, make(chan Event, defaultChanSize))
@@ -179,6 +181,12 @@ func (v *VM) Eval(ctx *Context, a ast.Argument) (interface{}, error) {
 		return a.Float64(), nil
 	case ast.Text:
 		return a.Text(), nil
+	case ast.Var:
+		v, ok := ctx.Get(a.Name())
+		if !ok {
+			return nil, fmt.Errorf("Variable %v is not defined", a)
+		}
+		return v, nil
 	}
 	return nil, fmt.Errorf("cannot decode %v into a meangingful value", a)
 }

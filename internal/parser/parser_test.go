@@ -26,11 +26,14 @@ var (
 			fmt: "{ echo 123 world123 w123h; }"},
 		{subject: "symbols have separators", code: "{ echo-1! should.be.valid; }",
 			fmt: "{ echo-1! should.be.valid; }"},
+		{subject: "can use variables as arguments", code: "{println $variable; }",
+			fmt: "{ println $variable; }"},
 	}
 )
 
 func TestParser(t *testing.T) {
 	runTestCase := func(t *testing.T, tc testCase) {
+		t.Logf("Test subject: %v", tc.subject)
 		code := tc.code
 		ast, err := Parse(code)
 		if err != tc.expectedError {

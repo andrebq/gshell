@@ -1,6 +1,7 @@
 package vm
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -13,6 +14,25 @@ var (
 	StdinChannel  = mustSym("stdin")
 	StderrChannel = mustSym("stderr")
 )
+
+func GShellLetVariable(c *CallStack) {
+	if len(c.RawArgs) != 2 {
+		c.FailWith = errors.New("Invalid use of 'let', should be: 'let <$variableName> <value>'")
+		return
+	}
+	varname := c.RawArgs[0].(ast.Var).Name()
+	parent := c.Context.parent
+	if !parent.CanBind(varname) {
+		c.FailWith = fmt.Errorf("Variable %v is already defined in the context", varname.Text())
+		return
+	}
+	val, err := c.VM.Eval(c.Context, c.RawArgs[1])
+	if err != nil {
+		c.FailWith = err
+		return
+	}
+	parent.Let(varname, val)
+}
 
 func GShellPrintln(c *CallStack) {
 	parts := make([]string, len(c.RawArgs))

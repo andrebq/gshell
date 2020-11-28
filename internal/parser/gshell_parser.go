@@ -15,54 +15,58 @@ var _ = fmt.Printf
 var _ = reflect.Copy
 var _ = strconv.Itoa
 
-
 var parserATN = []uint16{
-	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 9, 82, 4, 
-	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 4, 
-	8, 9, 8, 4, 9, 9, 9, 4, 10, 9, 10, 4, 11, 9, 11, 3, 2, 3, 2, 3, 2, 3, 3, 
-	3, 3, 3, 4, 7, 4, 29, 10, 4, 12, 4, 14, 4, 32, 11, 4, 3, 4, 3, 4, 7, 4, 
-	36, 10, 4, 12, 4, 14, 4, 39, 11, 4, 3, 5, 3, 5, 7, 5, 43, 10, 5, 12, 5, 
-	14, 5, 46, 11, 5, 3, 5, 3, 5, 3, 5, 3, 6, 3, 6, 3, 6, 3, 7, 3, 7, 3, 7, 
-	3, 7, 5, 7, 58, 10, 7, 3, 8, 3, 8, 3, 9, 3, 9, 7, 9, 64, 10, 9, 12, 9, 
-	14, 9, 67, 11, 9, 3, 9, 3, 9, 7, 9, 71, 10, 9, 12, 9, 14, 9, 74, 11, 9, 
-	5, 9, 76, 10, 9, 3, 10, 3, 10, 3, 11, 3, 11, 3, 11, 2, 2, 12, 2, 4, 6, 
-	8, 10, 12, 14, 16, 18, 20, 2, 3, 3, 2, 7, 8, 2, 78, 2, 22, 3, 2, 2, 2, 
-	4, 25, 3, 2, 2, 2, 6, 30, 3, 2, 2, 2, 8, 40, 3, 2, 2, 2, 10, 50, 3, 2, 
-	2, 2, 12, 57, 3, 2, 2, 2, 14, 59, 3, 2, 2, 2, 16, 75, 3, 2, 2, 2, 18, 77, 
-	3, 2, 2, 2, 20, 79, 3, 2, 2, 2, 22, 23, 5, 8, 5, 2, 23, 24, 7, 2, 2, 3, 
-	24, 3, 3, 2, 2, 2, 25, 26, 9, 2, 2, 2, 26, 5, 3, 2, 2, 2, 27, 29, 7, 8, 
-	2, 2, 28, 27, 3, 2, 2, 2, 29, 32, 3, 2, 2, 2, 30, 28, 3, 2, 2, 2, 30, 31, 
-	3, 2, 2, 2, 31, 33, 3, 2, 2, 2, 32, 30, 3, 2, 2, 2, 33, 37, 5, 10, 6, 2, 
-	34, 36, 7, 8, 2, 2, 35, 34, 3, 2, 2, 2, 36, 39, 3, 2, 2, 2, 37, 35, 3, 
-	2, 2, 2, 37, 38, 3, 2, 2, 2, 38, 7, 3, 2, 2, 2, 39, 37, 3, 2, 2, 2, 40, 
-	44, 7, 3, 2, 2, 41, 43, 5, 6, 4, 2, 42, 41, 3, 2, 2, 2, 43, 46, 3, 2, 2, 
-	2, 44, 42, 3, 2, 2, 2, 44, 45, 3, 2, 2, 2, 45, 47, 3, 2, 2, 2, 46, 44, 
-	3, 2, 2, 2, 47, 48, 7, 4, 2, 2, 48, 49, 7, 2, 2, 3, 49, 9, 3, 2, 2, 2, 
-	50, 51, 5, 12, 7, 2, 51, 52, 5, 4, 3, 2, 52, 11, 3, 2, 2, 2, 53, 58, 5, 
-	14, 8, 2, 54, 55, 5, 14, 8, 2, 55, 56, 5, 16, 9, 2, 56, 58, 3, 2, 2, 2, 
-	57, 53, 3, 2, 2, 2, 57, 54, 3, 2, 2, 2, 58, 13, 3, 2, 2, 2, 59, 60, 7, 
-	5, 2, 2, 60, 15, 3, 2, 2, 2, 61, 65, 5, 18, 10, 2, 62, 64, 5, 16, 9, 2, 
-	63, 62, 3, 2, 2, 2, 64, 67, 3, 2, 2, 2, 65, 63, 3, 2, 2, 2, 65, 66, 3, 
-	2, 2, 2, 66, 76, 3, 2, 2, 2, 67, 65, 3, 2, 2, 2, 68, 72, 5, 20, 11, 2, 
-	69, 71, 5, 16, 9, 2, 70, 69, 3, 2, 2, 2, 71, 74, 3, 2, 2, 2, 72, 70, 3, 
-	2, 2, 2, 72, 73, 3, 2, 2, 2, 73, 76, 3, 2, 2, 2, 74, 72, 3, 2, 2, 2, 75, 
-	61, 3, 2, 2, 2, 75, 68, 3, 2, 2, 2, 76, 17, 3, 2, 2, 2, 77, 78, 7, 5, 2, 
-	2, 78, 19, 3, 2, 2, 2, 79, 80, 7, 6, 2, 2, 80, 21, 3, 2, 2, 2, 9, 30, 37, 
-	44, 57, 65, 72, 75,
+	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 10, 94, 4,
+	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 4,
+	8, 9, 8, 4, 9, 9, 9, 4, 10, 9, 10, 4, 11, 9, 11, 4, 12, 9, 12, 3, 2, 3,
+	2, 3, 2, 3, 3, 3, 3, 3, 4, 7, 4, 31, 10, 4, 12, 4, 14, 4, 34, 11, 4, 3,
+	4, 3, 4, 7, 4, 38, 10, 4, 12, 4, 14, 4, 41, 11, 4, 3, 5, 3, 5, 7, 5, 45,
+	10, 5, 12, 5, 14, 5, 48, 11, 5, 3, 5, 3, 5, 3, 5, 3, 6, 3, 6, 3, 6, 3,
+	7, 3, 7, 3, 7, 3, 7, 5, 7, 60, 10, 7, 3, 8, 3, 8, 3, 9, 3, 9, 7, 9, 66,
+	10, 9, 12, 9, 14, 9, 69, 11, 9, 3, 9, 3, 9, 7, 9, 73, 10, 9, 12, 9, 14,
+	9, 76, 11, 9, 3, 9, 3, 9, 7, 9, 80, 10, 9, 12, 9, 14, 9, 83, 11, 9, 5,
+	9, 85, 10, 9, 3, 10, 3, 10, 3, 11, 3, 11, 3, 12, 3, 12, 3, 12, 3, 12, 2,
+	2, 13, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 2, 3, 3, 2, 8, 9, 2, 91,
+	2, 24, 3, 2, 2, 2, 4, 27, 3, 2, 2, 2, 6, 32, 3, 2, 2, 2, 8, 42, 3, 2, 2,
+	2, 10, 52, 3, 2, 2, 2, 12, 59, 3, 2, 2, 2, 14, 61, 3, 2, 2, 2, 16, 84,
+	3, 2, 2, 2, 18, 86, 3, 2, 2, 2, 20, 88, 3, 2, 2, 2, 22, 90, 3, 2, 2, 2,
+	24, 25, 5, 8, 5, 2, 25, 26, 7, 2, 2, 3, 26, 3, 3, 2, 2, 2, 27, 28, 9, 2,
+	2, 2, 28, 5, 3, 2, 2, 2, 29, 31, 7, 9, 2, 2, 30, 29, 3, 2, 2, 2, 31, 34,
+	3, 2, 2, 2, 32, 30, 3, 2, 2, 2, 32, 33, 3, 2, 2, 2, 33, 35, 3, 2, 2, 2,
+	34, 32, 3, 2, 2, 2, 35, 39, 5, 10, 6, 2, 36, 38, 7, 9, 2, 2, 37, 36, 3,
+	2, 2, 2, 38, 41, 3, 2, 2, 2, 39, 37, 3, 2, 2, 2, 39, 40, 3, 2, 2, 2, 40,
+	7, 3, 2, 2, 2, 41, 39, 3, 2, 2, 2, 42, 46, 7, 3, 2, 2, 43, 45, 5, 6, 4,
+	2, 44, 43, 3, 2, 2, 2, 45, 48, 3, 2, 2, 2, 46, 44, 3, 2, 2, 2, 46, 47,
+	3, 2, 2, 2, 47, 49, 3, 2, 2, 2, 48, 46, 3, 2, 2, 2, 49, 50, 7, 4, 2, 2,
+	50, 51, 7, 2, 2, 3, 51, 9, 3, 2, 2, 2, 52, 53, 5, 12, 7, 2, 53, 54, 5,
+	4, 3, 2, 54, 11, 3, 2, 2, 2, 55, 60, 5, 14, 8, 2, 56, 57, 5, 14, 8, 2,
+	57, 58, 5, 16, 9, 2, 58, 60, 3, 2, 2, 2, 59, 55, 3, 2, 2, 2, 59, 56, 3,
+	2, 2, 2, 60, 13, 3, 2, 2, 2, 61, 62, 7, 6, 2, 2, 62, 15, 3, 2, 2, 2, 63,
+	67, 5, 18, 10, 2, 64, 66, 5, 16, 9, 2, 65, 64, 3, 2, 2, 2, 66, 69, 3, 2,
+	2, 2, 67, 65, 3, 2, 2, 2, 67, 68, 3, 2, 2, 2, 68, 85, 3, 2, 2, 2, 69, 67,
+	3, 2, 2, 2, 70, 74, 5, 20, 11, 2, 71, 73, 5, 16, 9, 2, 72, 71, 3, 2, 2,
+	2, 73, 76, 3, 2, 2, 2, 74, 72, 3, 2, 2, 2, 74, 75, 3, 2, 2, 2, 75, 85,
+	3, 2, 2, 2, 76, 74, 3, 2, 2, 2, 77, 81, 5, 22, 12, 2, 78, 80, 5, 16, 9,
+	2, 79, 78, 3, 2, 2, 2, 80, 83, 3, 2, 2, 2, 81, 79, 3, 2, 2, 2, 81, 82,
+	3, 2, 2, 2, 82, 85, 3, 2, 2, 2, 83, 81, 3, 2, 2, 2, 84, 63, 3, 2, 2, 2,
+	84, 70, 3, 2, 2, 2, 84, 77, 3, 2, 2, 2, 85, 17, 3, 2, 2, 2, 86, 87, 7,
+	6, 2, 2, 87, 19, 3, 2, 2, 2, 88, 89, 7, 7, 2, 2, 89, 21, 3, 2, 2, 2, 90,
+	91, 7, 5, 2, 2, 91, 92, 7, 6, 2, 2, 92, 23, 3, 2, 2, 2, 10, 32, 39, 46,
+	59, 67, 74, 81, 84,
 }
 var deserializer = antlr.NewATNDeserializer(nil)
 var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
 
 var literalNames = []string{
-	"", "'{'", "'}'",
+	"", "'{'", "'}'", "'$'",
 }
 var symbolicNames = []string{
-	"", "", "", "IDENTIFIER", "NUMBER", "TERMINATOR", "NL", "WS",
+	"", "", "", "", "IDENTIFIER", "NUMBER", "TERMINATOR", "NL", "WS",
 }
 
 var ruleNames = []string{
-	"start", "terminator", "commandListItem", "script", "singleCommand", "commandLine", 
-	"commandName", "arguments", "namedArgument", "numericArgument",
+	"start", "terminator", "commandListItem", "script", "singleCommand", "commandLine",
+	"commandName", "arguments", "namedArgument", "numericArgument", "variableArgument",
 }
 var decisionToDFA = make([]*antlr.DFA, len(deserializedATN.DecisionToState))
 
@@ -92,28 +96,30 @@ func NewGShellParser(input antlr.TokenStream) *GShellParser {
 
 // GShellParser tokens.
 const (
-	GShellParserEOF = antlr.TokenEOF
-	GShellParserT__0 = 1
-	GShellParserT__1 = 2
-	GShellParserIDENTIFIER = 3
-	GShellParserNUMBER = 4
-	GShellParserTERMINATOR = 5
-	GShellParserNL = 6
-	GShellParserWS = 7
+	GShellParserEOF        = antlr.TokenEOF
+	GShellParserT__0       = 1
+	GShellParserT__1       = 2
+	GShellParserT__2       = 3
+	GShellParserIDENTIFIER = 4
+	GShellParserNUMBER     = 5
+	GShellParserTERMINATOR = 6
+	GShellParserNL         = 7
+	GShellParserWS         = 8
 )
 
 // GShellParser rules.
 const (
-	GShellParserRULE_start = 0
-	GShellParserRULE_terminator = 1
-	GShellParserRULE_commandListItem = 2
-	GShellParserRULE_script = 3
-	GShellParserRULE_singleCommand = 4
-	GShellParserRULE_commandLine = 5
-	GShellParserRULE_commandName = 6
-	GShellParserRULE_arguments = 7
-	GShellParserRULE_namedArgument = 8
-	GShellParserRULE_numericArgument = 9
+	GShellParserRULE_start            = 0
+	GShellParserRULE_terminator       = 1
+	GShellParserRULE_commandListItem  = 2
+	GShellParserRULE_script           = 3
+	GShellParserRULE_singleCommand    = 4
+	GShellParserRULE_commandLine      = 5
+	GShellParserRULE_commandName      = 6
+	GShellParserRULE_arguments        = 7
+	GShellParserRULE_namedArgument    = 8
+	GShellParserRULE_numericArgument  = 9
+	GShellParserRULE_variableArgument = 10
 )
 
 // IStartContext is an interface to support dynamic dispatch.
@@ -176,7 +182,6 @@ func (s *StartContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) 
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *StartContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterStart(s)
@@ -188,9 +193,6 @@ func (s *StartContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitStart(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) Start() (localctx IStartContext) {
 	localctx = NewStartContext(p, p.GetParserRuleContext(), p.GetState())
@@ -214,19 +216,16 @@ func (p *GShellParser) Start() (localctx IStartContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(20)
+		p.SetState(22)
 		p.Script()
 	}
 	{
-		p.SetState(21)
+		p.SetState(23)
 		p.Match(GShellParserEOF)
 	}
 
-
-
 	return localctx
 }
-
 
 // ITerminatorContext is an interface to support dynamic dispatch.
 type ITerminatorContext interface {
@@ -282,7 +281,6 @@ func (s *TerminatorContext) ToStringTree(ruleNames []string, recog antlr.Recogni
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *TerminatorContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterTerminator(s)
@@ -295,14 +293,10 @@ func (s *TerminatorContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
-
-
-
 func (p *GShellParser) Terminator() (localctx ITerminatorContext) {
 	localctx = NewTerminatorContext(p, p.GetParserRuleContext(), p.GetState())
 	p.EnterRule(localctx, 2, GShellParserRULE_terminator)
 	var _la int
-
 
 	defer func() {
 		p.ExitRule()
@@ -322,7 +316,7 @@ func (p *GShellParser) Terminator() (localctx ITerminatorContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(23)
+		p.SetState(25)
 		_la = p.GetTokenStream().LA(1)
 
 		if !(_la == GShellParserTERMINATOR || _la == GShellParserNL) {
@@ -333,11 +327,8 @@ func (p *GShellParser) Terminator() (localctx ITerminatorContext) {
 		}
 	}
 
-
-
 	return localctx
 }
-
 
 // ICommandListItemContext is an interface to support dynamic dispatch.
 type ICommandListItemContext interface {
@@ -403,7 +394,6 @@ func (s *CommandListItemContext) ToStringTree(ruleNames []string, recog antlr.Re
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *CommandListItemContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterCommandListItem(s)
@@ -416,14 +406,10 @@ func (s *CommandListItemContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
-
-
-
 func (p *GShellParser) CommandListItem() (localctx ICommandListItemContext) {
 	localctx = NewCommandListItemContext(p, p.GetParserRuleContext(), p.GetState())
 	p.EnterRule(localctx, 4, GShellParserRULE_commandListItem)
 	var _la int
-
 
 	defer func() {
 		p.ExitRule()
@@ -444,49 +430,43 @@ func (p *GShellParser) CommandListItem() (localctx ICommandListItemContext) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(28)
+	p.SetState(30)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-
 	for _la == GShellParserNL {
 		{
-			p.SetState(25)
+			p.SetState(27)
 			p.Match(GShellParserNL)
 		}
 
-
-		p.SetState(30)
+		p.SetState(32)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(31)
+		p.SetState(33)
 		p.SingleCommand()
 	}
-	p.SetState(35)
+	p.SetState(37)
 	p.GetErrorHandler().Sync(p)
 	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext())
 
 	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
 		if _alt == 1 {
 			{
-				p.SetState(32)
+				p.SetState(34)
 				p.Match(GShellParserNL)
 			}
 
-
 		}
-		p.SetState(37)
+		p.SetState(39)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext())
 	}
 
-
-
 	return localctx
 }
-
 
 // IScriptContext is an interface to support dynamic dispatch.
 type IScriptContext interface {
@@ -561,7 +541,6 @@ func (s *ScriptContext) ToStringTree(ruleNames []string, recog antlr.Recognizer)
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *ScriptContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterScript(s)
@@ -574,14 +553,10 @@ func (s *ScriptContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
-
-
-
 func (p *GShellParser) Script() (localctx IScriptContext) {
 	localctx = NewScriptContext(p, p.GetParserRuleContext(), p.GetState())
 	p.EnterRule(localctx, 6, GShellParserRULE_script)
 	var _la int
-
 
 	defer func() {
 		p.ExitRule()
@@ -601,39 +576,34 @@ func (p *GShellParser) Script() (localctx IScriptContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(38)
+		p.SetState(40)
 		p.Match(GShellParserT__0)
 	}
-	p.SetState(42)
+	p.SetState(44)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-
 	for _la == GShellParserIDENTIFIER || _la == GShellParserNL {
 		{
-			p.SetState(39)
+			p.SetState(41)
 			p.CommandListItem()
 		}
 
-
-		p.SetState(44)
+		p.SetState(46)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(45)
+		p.SetState(47)
 		p.Match(GShellParserT__1)
 	}
 	{
-		p.SetState(46)
+		p.SetState(48)
 		p.Match(GShellParserEOF)
 	}
 
-
-
 	return localctx
 }
-
 
 // ISingleCommandContext is an interface to support dynamic dispatch.
 type ISingleCommandContext interface {
@@ -701,7 +671,6 @@ func (s *SingleCommandContext) ToStringTree(ruleNames []string, recog antlr.Reco
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *SingleCommandContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterSingleCommand(s)
@@ -713,9 +682,6 @@ func (s *SingleCommandContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitSingleCommand(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) SingleCommand() (localctx ISingleCommandContext) {
 	localctx = NewSingleCommandContext(p, p.GetParserRuleContext(), p.GetState())
@@ -739,19 +705,16 @@ func (p *GShellParser) SingleCommand() (localctx ISingleCommandContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(48)
+		p.SetState(50)
 		p.CommandLine()
 	}
 	{
-		p.SetState(49)
+		p.SetState(51)
 		p.Terminator()
 	}
 
-
-
 	return localctx
 }
-
 
 // ICommandLineContext is an interface to support dynamic dispatch.
 type ICommandLineContext interface {
@@ -819,7 +782,6 @@ func (s *CommandLineContext) ToStringTree(ruleNames []string, recog antlr.Recogn
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *CommandLineContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterCommandLine(s)
@@ -831,9 +793,6 @@ func (s *CommandLineContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitCommandLine(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) CommandLine() (localctx ICommandLineContext) {
 	localctx = NewCommandLineContext(p, p.GetParserRuleContext(), p.GetState())
@@ -855,34 +814,31 @@ func (p *GShellParser) CommandLine() (localctx ICommandLineContext) {
 		}
 	}()
 
-	p.SetState(55)
+	p.SetState(57)
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 3, p.GetParserRuleContext()) {
 	case 1:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(51)
+			p.SetState(53)
 			p.CommandName()
 		}
-
 
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(52)
+			p.SetState(54)
 			p.CommandName()
 		}
 		{
-			p.SetState(53)
+			p.SetState(55)
 			p.Arguments()
 		}
 
 	}
 
-
 	return localctx
 }
-
 
 // ICommandNameContext is an interface to support dynamic dispatch.
 type ICommandNameContext interface {
@@ -934,7 +890,6 @@ func (s *CommandNameContext) ToStringTree(ruleNames []string, recog antlr.Recogn
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *CommandNameContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterCommandName(s)
@@ -946,9 +901,6 @@ func (s *CommandNameContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitCommandName(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) CommandName() (localctx ICommandNameContext) {
 	localctx = NewCommandNameContext(p, p.GetParserRuleContext(), p.GetState())
@@ -972,15 +924,12 @@ func (p *GShellParser) CommandName() (localctx ICommandNameContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(57)
+		p.SetState(59)
 		p.Match(GShellParserIDENTIFIER)
 	}
 
-
-
 	return localctx
 }
-
 
 // IArgumentsContext is an interface to support dynamic dispatch.
 type IArgumentsContext interface {
@@ -1063,6 +1012,16 @@ func (s *ArgumentsContext) NumericArgument() INumericArgumentContext {
 	return t.(INumericArgumentContext)
 }
 
+func (s *ArgumentsContext) VariableArgument() IVariableArgumentContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IVariableArgumentContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IVariableArgumentContext)
+}
+
 func (s *ArgumentsContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
@@ -1070,7 +1029,6 @@ func (s *ArgumentsContext) GetRuleContext() antlr.RuleContext {
 func (s *ArgumentsContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
-
 
 func (s *ArgumentsContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
@@ -1083,9 +1041,6 @@ func (s *ArgumentsContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitArguments(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) Arguments() (localctx IArgumentsContext) {
 	localctx = NewArgumentsContext(p, p.GetParserRuleContext(), p.GetState())
@@ -1109,69 +1064,85 @@ func (p *GShellParser) Arguments() (localctx IArgumentsContext) {
 
 	var _alt int
 
-	p.SetState(73)
+	p.SetState(82)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
 	case GShellParserIDENTIFIER:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(59)
+			p.SetState(61)
 			p.NamedArgument()
 		}
-		p.SetState(63)
+		p.SetState(65)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 4, p.GetParserRuleContext())
 
 		for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
 			if _alt == 1 {
 				{
-					p.SetState(60)
+					p.SetState(62)
 					p.Arguments()
 				}
 
-
 			}
-			p.SetState(65)
+			p.SetState(67)
 			p.GetErrorHandler().Sync(p)
 			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 4, p.GetParserRuleContext())
 		}
 
-
 	case GShellParserNUMBER:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(66)
+			p.SetState(68)
 			p.NumericArgument()
 		}
-		p.SetState(70)
+		p.SetState(72)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 5, p.GetParserRuleContext())
 
 		for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
 			if _alt == 1 {
 				{
-					p.SetState(67)
+					p.SetState(69)
 					p.Arguments()
 				}
 
-
 			}
-			p.SetState(72)
+			p.SetState(74)
 			p.GetErrorHandler().Sync(p)
 			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 5, p.GetParserRuleContext())
 		}
 
+	case GShellParserT__2:
+		p.EnterOuterAlt(localctx, 3)
+		{
+			p.SetState(75)
+			p.VariableArgument()
+		}
+		p.SetState(79)
+		p.GetErrorHandler().Sync(p)
+		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 6, p.GetParserRuleContext())
 
+		for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
+			if _alt == 1 {
+				{
+					p.SetState(76)
+					p.Arguments()
+				}
+
+			}
+			p.SetState(81)
+			p.GetErrorHandler().Sync(p)
+			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 6, p.GetParserRuleContext())
+		}
 
 	default:
 		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
 	}
 
-
 	return localctx
 }
-
 
 // INamedArgumentContext is an interface to support dynamic dispatch.
 type INamedArgumentContext interface {
@@ -1223,7 +1194,6 @@ func (s *NamedArgumentContext) ToStringTree(ruleNames []string, recog antlr.Reco
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *NamedArgumentContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterNamedArgument(s)
@@ -1235,9 +1205,6 @@ func (s *NamedArgumentContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitNamedArgument(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) NamedArgument() (localctx INamedArgumentContext) {
 	localctx = NewNamedArgumentContext(p, p.GetParserRuleContext(), p.GetState())
@@ -1261,15 +1228,12 @@ func (p *GShellParser) NamedArgument() (localctx INamedArgumentContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(75)
+		p.SetState(84)
 		p.Match(GShellParserIDENTIFIER)
 	}
 
-
-
 	return localctx
 }
-
 
 // INumericArgumentContext is an interface to support dynamic dispatch.
 type INumericArgumentContext interface {
@@ -1321,7 +1285,6 @@ func (s *NumericArgumentContext) ToStringTree(ruleNames []string, recog antlr.Re
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *NumericArgumentContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterNumericArgument(s)
@@ -1333,9 +1296,6 @@ func (s *NumericArgumentContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitNumericArgument(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) NumericArgument() (localctx INumericArgumentContext) {
 	localctx = NewNumericArgumentContext(p, p.GetParserRuleContext(), p.GetState())
@@ -1359,13 +1319,104 @@ func (p *GShellParser) NumericArgument() (localctx INumericArgumentContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(77)
+		p.SetState(86)
 		p.Match(GShellParserNUMBER)
 	}
-
-
 
 	return localctx
 }
 
+// IVariableArgumentContext is an interface to support dynamic dispatch.
+type IVariableArgumentContext interface {
+	antlr.ParserRuleContext
 
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// IsVariableArgumentContext differentiates from other interfaces.
+	IsVariableArgumentContext()
+}
+
+type VariableArgumentContext struct {
+	*antlr.BaseParserRuleContext
+	parser antlr.Parser
+}
+
+func NewEmptyVariableArgumentContext() *VariableArgumentContext {
+	var p = new(VariableArgumentContext)
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
+	p.RuleIndex = GShellParserRULE_variableArgument
+	return p
+}
+
+func (*VariableArgumentContext) IsVariableArgumentContext() {}
+
+func NewVariableArgumentContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *VariableArgumentContext {
+	var p = new(VariableArgumentContext)
+
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
+
+	p.parser = parser
+	p.RuleIndex = GShellParserRULE_variableArgument
+
+	return p
+}
+
+func (s *VariableArgumentContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *VariableArgumentContext) IDENTIFIER() antlr.TerminalNode {
+	return s.GetToken(GShellParserIDENTIFIER, 0)
+}
+
+func (s *VariableArgumentContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *VariableArgumentContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+func (s *VariableArgumentContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(GShellListener); ok {
+		listenerT.EnterVariableArgument(s)
+	}
+}
+
+func (s *VariableArgumentContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(GShellListener); ok {
+		listenerT.ExitVariableArgument(s)
+	}
+}
+
+func (p *GShellParser) VariableArgument() (localctx IVariableArgumentContext) {
+	localctx = NewVariableArgumentContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 20, GShellParserRULE_variableArgument)
+
+	defer func() {
+		p.ExitRule()
+	}()
+
+	defer func() {
+		if err := recover(); err != nil {
+			if v, ok := err.(antlr.RecognitionException); ok {
+				localctx.SetException(v)
+				p.GetErrorHandler().ReportError(p, v)
+				p.GetErrorHandler().Recover(p, v)
+			} else {
+				panic(err)
+			}
+		}
+	}()
+
+	p.EnterOuterAlt(localctx, 1)
+	{
+		p.SetState(88)
+		p.Match(GShellParserT__2)
+	}
+	{
+		p.SetState(89)
+		p.Match(GShellParserIDENTIFIER)
+	}
+
+	return localctx
+}

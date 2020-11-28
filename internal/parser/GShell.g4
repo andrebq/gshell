@@ -3,12 +3,14 @@ grammar GShell;
 // Tokens
 fragment LETTER: [\p{Ll}|\p{Lu}];
 fragment DIGIT: [\p{Nd}];
-fragment PUCTUATION: [!?.\-+*&^%$#@~];
+fragment PUNCTUATION_HEAD: [!?.\-+*&^%#@~];
+fragment PUCTUATION_TAIL: PUNCTUATION_HEAD | [$];
 fragment INT: '-' DIGIT+ | DIGIT+;
 fragment FLOAT: INT '.' DIGIT+;
-fragment IDENTIFER_START: LETTER+|PUCTUATION+;
+fragment IDENTIFER_START: LETTER|PUNCTUATION_HEAD;
+fragment IDENTIFIER_TAIL: (DIGIT|LETTER|PUCTUATION_TAIL);
 
-IDENTIFIER: IDENTIFER_START (DIGIT|IDENTIFER_START)*;
+IDENTIFIER: IDENTIFER_START IDENTIFIER_TAIL*;
 NUMBER: INT | FLOAT;
 
 TERMINATOR: [;];
@@ -41,10 +43,12 @@ commandName : IDENTIFIER ;
 
 arguments
    : namedArgument arguments*
-   | numericArgument arguments*;
+   | numericArgument arguments*
+   | variableArgument arguments*;
 
 namedArgument : IDENTIFIER ;
 numericArgument : NUMBER ;
+variableArgument : '$' IDENTIFIER ;
 
 // expression
 //    : expression op=('*'|'/') expression # MulDiv

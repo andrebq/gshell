@@ -38,6 +38,9 @@ type GShellListener interface {
 	// EnterNumericArgument is called when entering the numericArgument production.
 	EnterNumericArgument(c *NumericArgumentContext)
 
+	// EnterVariableArgument is called when entering the variableArgument production.
+	EnterVariableArgument(c *VariableArgumentContext)
+
 	// ExitStart is called when exiting the start production.
 	ExitStart(c *StartContext)
 
@@ -67,4 +70,7 @@ type GShellListener interface {
 
 	// ExitNumericArgument is called when exiting the numericArgument production.
 	ExitNumericArgument(c *NumericArgumentContext)
+
+	// ExitVariableArgument is called when exiting the variableArgument production.
+	ExitVariableArgument(c *VariableArgumentContext)
 }

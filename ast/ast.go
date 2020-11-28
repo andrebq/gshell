@@ -33,6 +33,10 @@ type (
 		sym string
 	}
 
+	Var struct {
+		sym Symbol
+	}
+
 	Formatter interface {
 		Fmt(Printer)
 	}
@@ -46,7 +50,7 @@ var (
 	// this should be kept in sync with the parser rules
 	// otherwise the package won't be able to create the Symbol node
 	// TODO: think of a way to avoid this duplicated re
-	symbolRe = regexp.MustCompile(`[\p{Ll}|\p{Lu}|!|?|\.|\\|-|+|*|&|^|%|$|#|@|~]+[\p{Ll}|\p{Lu}|!|?|\.|\\|-|+|*|&|^|%|$|#|@|~|0-9]*`)
+	symbolRe = regexp.MustCompile(`[\p{Ll}|\p{Lu}|!|?|\.|\\|-|+|*|&|^|%|#|@|~]+[\p{Ll}|\p{Lu}|!|?|\.|\\|-|+|*|&|^|%|$|#|@|~|0-9]*`)
 
 	errNotAValidSymbol = errors.New("not a valid symbol")
 )
@@ -54,23 +58,31 @@ var (
 func (s Symbol) Fmt(p Printer) {
 	p.WriteString(s.sym)
 }
-func (s Symbol) Text() string { return s.sym }
-
-func (s Symbol) anchor() {}
+func (s Symbol) Text() string   { return s.sym }
+func (s Symbol) anchor()        {}
+func (s Symbol) String() string { return s.sym }
 
 func (n Number) Fmt(p Printer) {
 	p.WriteString(strconv.FormatFloat(n.float64, 'f', -1, 64))
 }
 func (n Number) Float64() float64 { return n.float64 }
-
-func (n Number) anchor() {}
+func (n Number) anchor()          {}
+func (n Number) String() string   { return strconv.FormatFloat(n.float64, 'f', -1, 64) }
 
 func (t Text) Fmt(p Printer) {
 	p.WriteString(t.string)
 }
-func (t Text) Text() string { return t.string }
+func (t Text) Text() string   { return t.string }
+func (t Text) String() string { return t.string }
+func (t Text) anchor()        {}
 
-func (t Text) anchor() {}
+func (v Var) anchor() {}
+func (v Var) Fmt(p Printer) {
+	p.WriteString("$")
+	v.sym.Fmt(p)
+}
+func (v Var) Name() Symbol   { return v.sym }
+func (v Var) String() string { return "$" + v.sym.Text() }
 
 func (c *Cmd) Fmt(p Printer) {
 	c.command.Fmt(p)
@@ -165,6 +177,12 @@ func NewSymbol(s string) (Symbol, error) {
 		return Symbol{}, errNotAValidSymbol
 	}
 	return Symbol{sym: s}, nil
+}
+
+func NewVar(sym Symbol) Var { return Var{sym} }
+func NewVarString(s string) (Var, error) {
+	sym, err := NewSymbol(s)
+	return NewVar(sym), err
 }
 
 func (s *Script) AddCommand(cmd *Cmd) *Script {
