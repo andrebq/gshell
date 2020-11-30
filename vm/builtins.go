@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/andrebq/gshell/ast"
+	"github.com/andrebq/gshell/ast/match"
 )
 
 var (
@@ -52,4 +53,11 @@ func GShellPrintln(c *CallStack) {
 		}
 	}
 	c.VM.PushValues(StdoutChannel, c.Context, strings.Join(parts, " ")+"\n")
+}
+
+func GShellIf(c *CallStack) {
+	var exp ast.Argument
+	if !match.Head(&exp, &c.RawArgs) {
+		c.FailWith = errors.New("Missing conditional expression")
+	}
 }

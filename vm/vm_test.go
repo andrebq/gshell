@@ -47,3 +47,21 @@ func TestSetVariable(t *testing.T) {
 		t.Error("out channel should have at least one entry")
 	}
 }
+
+func TestConditional(t *testing.T) {
+	vm := NewVM()
+	err := vm.Run("{ if true { println true; } else { println false; }; }")
+	if err != nil {
+		t.Error(err)
+	}
+	out := vm.Stdout()
+	var ev Event
+	select {
+	case ev = <-out:
+		if !reflect.DeepEqual(ev.Main, fmt.Sprintf("true\n")) {
+			t.Errorf("Unexpected value %#v in stdout channel", ev.Main)
+		}
+	default:
+		t.Error("out channel should have at least one entry")
+	}
+}
