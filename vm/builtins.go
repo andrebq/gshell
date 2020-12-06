@@ -33,6 +33,7 @@ func GShellLetVariable(c *CallStack) {
 		return
 	}
 	parent.Let(varname, val)
+	c.ReturnValue = val
 }
 
 func GShellPrintln(c *CallStack) {
@@ -53,11 +54,45 @@ func GShellPrintln(c *CallStack) {
 		}
 	}
 	c.VM.PushValues(StdoutChannel, c.Context, strings.Join(parts, " ")+"\n")
+	c.ReturnValue = trueSym
 }
 
 func GShellIf(c *CallStack) {
+	switch len(c.RawArgs) {
+	case 2:
+	case 4:
+		break
+	default:
+		c.FailWith = errors.New("If command: if <expression> { <commands > } [else { <commands> } ]")
+		return
+	}
 	var exp ast.Argument
-	if !match.Head(&exp, &c.RawArgs) {
+	if !match.Apply(&c.RawArgs, match.Head(&exp)) {
 		c.FailWith = errors.New("Missing conditional expression")
+	}
+	var thenBlock *ast.Script
+	if !match.Apply(&c.RawArgs, match.Script(&thenBlock)) {
+		c.FailWith = errors.New("Missing then block")
+		return
+	}
+
+	var elseBlock *ast.Script
+	match.Apply(&c.RawArgs, match.Guard(match.Symbol(elseSym), match.Script(&elseBlock)))
+
+	cond, err := c.VM.Eval(c.Context, exp)
+	if err != nil {
+		c.FailWith = err
+		return
+	}
+
+	var boolValue bool
+	c.FailWith = c.VM.CastTo(c.Context, cond, &boolValue)
+	if c.FailWith != nil {
+		return
+	}
+	if boolValue {
+		c.ReturnValue, c.FailWith = c.VM.Eval(c.Context, thenBlock)
+	} else if elseBlock != nil {
+		c.ReturnValue, c.FailWith = c.VM.Eval(c.Context, elseBlock)
 	}
 }

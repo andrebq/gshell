@@ -10,7 +10,7 @@ func TestVM(t *testing.T) {
 	vm := NewVM()
 	// no need to consume all the tokens from stdout
 	// as the buffer is large enough
-	err := vm.Run("{ println hello world; }")
+	_, err := vm.Run("{ println hello world; }")
 	if err != nil {
 		t.Error(err)
 	}
@@ -31,7 +31,7 @@ func TestSetVariable(t *testing.T) {
 	vm := NewVM()
 	// no need to consume all the tokens from stdout
 	// as the buffer is large enough
-	err := vm.Run("{ let $hello 123; println $hello; }")
+	_, err := vm.Run("{ let $hello 123; println $hello; }")
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,7 +50,7 @@ func TestSetVariable(t *testing.T) {
 
 func TestConditional(t *testing.T) {
 	vm := NewVM()
-	err := vm.Run("{ if true { println true; } else { println false; }; }")
+	_, err := vm.Run("{ if true { println true; } else { println false; }; if false { println true; } else { println false; }; }")
 	if err != nil {
 		t.Error(err)
 	}
@@ -63,5 +63,13 @@ func TestConditional(t *testing.T) {
 		}
 	default:
 		t.Error("out channel should have at least one entry")
+	}
+	select {
+	case ev = <-out:
+		if !reflect.DeepEqual(ev.Main, fmt.Sprintf("false\n")) {
+			t.Errorf("Unexpected value %#v in stdout channel", ev.Main)
+		}
+	default:
+		t.Error("out channel should have two entries")
 	}
 }
