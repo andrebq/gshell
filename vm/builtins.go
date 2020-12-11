@@ -57,42 +57,71 @@ func GShellPrintln(c *CallStack) {
 	c.ReturnValue = trueSym
 }
 
-func GShellIf(c *CallStack) {
-	switch len(c.RawArgs) {
-	case 2:
-	case 4:
-		break
-	default:
-		c.FailWith = errors.New("If command: if <expression> { <commands > } [else { <commands> } ]")
-		return
-	}
-	var exp ast.Argument
-	if !match.Apply(&c.RawArgs, match.Head(&exp)) {
-		c.FailWith = errors.New("Missing conditional expression")
-	}
-	var thenBlock *ast.Script
-	if !match.Apply(&c.RawArgs, match.Script(&thenBlock)) {
-		c.FailWith = errors.New("Missing then block")
+func GShellSwitch(c *CallStack) {
+	switchUseCase := "switch { case <<guard-script> <action-script> [<guard-script> <action-script>...] [else <action-script>] }"
+	var clauses *ast.Script
+	if !match.Apply(&c.RawArgs, match.Script(&clauses)) {
+		c.FailWith = errors.New(switchUseCase)
 		return
 	}
 
-	var elseBlock *ast.Script
-	match.Apply(&c.RawArgs, match.Guard(match.Symbol(elseSym), match.Script(&elseBlock)))
-
-	cond, err := c.VM.Eval(c.Context, exp)
-	if err != nil {
-		c.FailWith = err
-		return
+	type switchCase struct {
+		guard *ast.Script
+		body  *ast.Script
 	}
 
-	var boolValue bool
-	c.FailWith = c.VM.CastTo(c.Context, cond, &boolValue)
-	if c.FailWith != nil {
-		return
+	var cases []switchCase
+
+	for _, p := range clauses.Commands() {
+		switch p.Command() {
+		case caseSym:
+			var guard *ast.Script
+			var block *ast.Script
+			caseArgs := p.Arguments()
+			if !match.Apply(&caseArgs, match.Guard(match.Script(&guard), match.Script(&block))) {
+				c.FailWith = errors.New(switchUseCase)
+				return
+			}
+			cases = append(cases, switchCase{guard: guard, body: block})
+		case elseSym:
+			var block *ast.Script
+			elseArgs := p.Arguments()
+			if !match.Apply(&elseArgs, match.Script(&block)) {
+				c.FailWith = errors.New(switchUseCase)
+				return
+			}
+			cases = append(cases, switchCase{body: block})
+		default:
+			c.FailWith = errors.New(switchUseCase)
+		}
 	}
-	if boolValue {
-		c.ReturnValue, c.FailWith = c.VM.Eval(c.Context, thenBlock)
-	} else if elseBlock != nil {
-		c.ReturnValue, c.FailWith = c.VM.Eval(c.Context, elseBlock)
+
+	for _, sc := range cases {
+		ctx := NewContext(c.Context)
+		var boolVal bool
+		if sc.guard != nil {
+			val, err := c.VM.Eval(ctx, sc.guard)
+			if err != nil {
+				c.FailWith = err
+				return
+			}
+			if err := c.VM.CastTo(ctx, val, &boolVal); err != nil {
+				c.FailWith = err
+			}
+		} else {
+			boolVal = true
+		}
+
+		if boolVal {
+			ctx = NewContext(c.Context)
+			c.ReturnValue, c.FailWith = c.VM.Eval(ctx, sc.body)
+			return
+		}
+	}
+}
+
+func MakeIdentityProcess(val ast.Argument) ProcessFunc {
+	return func(c *CallStack) {
+		c.ReturnValue = val
 	}
 }

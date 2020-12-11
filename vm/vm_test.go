@@ -50,7 +50,16 @@ func TestSetVariable(t *testing.T) {
 
 func TestConditional(t *testing.T) {
 	vm := NewVM()
-	_, err := vm.Run("{ if true { println true; } else { println false; }; if false { println true; } else { println false; }; }")
+	_, err := vm.Run(`{
+		switch {
+			case { true; } { println true; }
+			else { println else; }
+		}
+		switch {
+			case { false; } { println case-false; }
+			else { println false; }
+		}
+}`)
 	if err != nil {
 		t.Error(err)
 	}

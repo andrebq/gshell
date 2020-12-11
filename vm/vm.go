@@ -51,8 +51,9 @@ type (
 var (
 	printlnSym = mustSym("println")
 	letSym     = mustSym("let")
-	ifSym      = mustSym("if")
+	switchSym  = mustSym("switch")
 	elseSym    = mustSym("else")
+	caseSym    = mustSym("case")
 
 	trueSym  = mustSym("true")
 	falseSym = mustSym("false")
@@ -79,7 +80,9 @@ func NewVM() *VM {
 	}
 	vm.builtins[printlnSym] = ProcessFunc(GShellPrintln)
 	vm.builtins[letSym] = ProcessFunc(GShellLetVariable)
-	vm.builtins[ifSym] = ProcessFunc(GShellIf)
+	vm.builtins[switchSym] = ProcessFunc(GShellSwitch)
+	vm.builtins[trueSym] = MakeIdentityProcess(trueSym)
+	vm.builtins[falseSym] = MakeIdentityProcess(falseSym)
 
 	const defaultChanSize = 1000
 	vm.rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))
