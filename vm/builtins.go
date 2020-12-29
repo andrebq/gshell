@@ -57,6 +57,37 @@ func GShellPrintln(c *CallStack) {
 	c.ReturnValue = trueSym
 }
 
+func GShellGuard(c *CallStack) {
+	var cond *ast.Script
+	var body *ast.Script
+	if !match.Apply(&c.RawArgs, match.Guard(match.Script(&cond), match.Script(&body))) {
+		c.FailWith = errors.New("guard {... conditions} {... actions}")
+		return
+	}
+
+	ctx := NewContext(c.Context)
+	condEval, err := c.VM.runScript(ctx, cond)
+	if err != nil {
+		c.FailWith = err
+	}
+	var allowed bool
+	if err = c.VM.CastTo(ctx, condEval, &allowed); err != nil {
+		c.FailWith = err
+	}
+	if !allowed {
+		c.ReturnValue = false
+		return
+	}
+
+	bodyEval, err := c.VM.runScript(ctx, body)
+	if err != nil {
+		c.FailWith = err
+		return
+	}
+	c.ReturnValue = bodyEval
+	return
+}
+
 func GShellSwitch(c *CallStack) {
 	switchUseCase := "switch { case <<guard-script> <action-script> [<guard-script> <action-script>...] [else <action-script>] }"
 	var clauses *ast.Script

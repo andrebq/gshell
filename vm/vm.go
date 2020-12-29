@@ -54,6 +54,7 @@ var (
 	switchSym  = mustSym("switch")
 	elseSym    = mustSym("else")
 	caseSym    = mustSym("case")
+	guardSym   = mustSym("guard")
 
 	trueSym  = mustSym("true")
 	falseSym = mustSym("false")
@@ -83,6 +84,7 @@ func NewVM() *VM {
 	vm.builtins[switchSym] = ProcessFunc(GShellSwitch)
 	vm.builtins[trueSym] = MakeIdentityProcess(trueSym)
 	vm.builtins[falseSym] = MakeIdentityProcess(falseSym)
+	vm.builtins[guardSym] = ProcessFunc(GShellGuard)
 
 	const defaultChanSize = 1000
 	vm.rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))
