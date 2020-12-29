@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/andrebq/gshell/ast"
+	"github.com/andrebq/gshell/ast/match"
 )
 
 var (
@@ -32,6 +33,7 @@ func GShellLetVariable(c *CallStack) {
 		return
 	}
 	parent.Let(varname, val)
+	c.ReturnValue = val
 }
 
 func GShellPrintln(c *CallStack) {
@@ -52,4 +54,105 @@ func GShellPrintln(c *CallStack) {
 		}
 	}
 	c.VM.PushValues(StdoutChannel, c.Context, strings.Join(parts, " ")+"\n")
+	c.ReturnValue = trueSym
+}
+
+func GShellGuard(c *CallStack) {
+	var cond *ast.Script
+	var body *ast.Script
+	if !match.Apply(&c.RawArgs, match.Guard(match.Script(&cond), match.Script(&body))) {
+		c.FailWith = errors.New("guard {... conditions} {... actions}")
+		return
+	}
+
+	condCtx := NewContext(c.Context)
+	condEval, err := c.VM.runScript(condCtx, cond)
+	if err != nil {
+		c.FailWith = err
+	}
+	var allowed bool
+	if err = c.VM.CastTo(condCtx, condEval, &allowed); err != nil {
+		c.FailWith = err
+	}
+	if !allowed {
+		c.ReturnValue = false
+		return
+	}
+
+	bodyEval, err := c.VM.runScript(c.Context, body)
+	if err != nil {
+		c.FailWith = err
+		return
+	}
+	c.ReturnValue = bodyEval
+	return
+}
+
+func GShellSwitch(c *CallStack) {
+	switchUseCase := "switch { case <<guard-script> <action-script> [<guard-script> <action-script>...] [else <action-script>] }"
+	var clauses *ast.Script
+	if !match.Apply(&c.RawArgs, match.Script(&clauses)) {
+		c.FailWith = errors.New(switchUseCase)
+		return
+	}
+
+	type switchCase struct {
+		guard *ast.Script
+		body  *ast.Script
+	}
+
+	var cases []switchCase
+
+	for _, p := range clauses.Commands() {
+		switch p.Command() {
+		case caseSym:
+			var guard *ast.Script
+			var block *ast.Script
+			caseArgs := p.Arguments()
+			if !match.Apply(&caseArgs, match.Guard(match.Script(&guard), match.Script(&block))) {
+				c.FailWith = errors.New(switchUseCase)
+				return
+			}
+			cases = append(cases, switchCase{guard: guard, body: block})
+		case elseSym:
+			var block *ast.Script
+			elseArgs := p.Arguments()
+			if !match.Apply(&elseArgs, match.Script(&block)) {
+				c.FailWith = errors.New(switchUseCase)
+				return
+			}
+			cases = append(cases, switchCase{body: block})
+		default:
+			c.FailWith = errors.New(switchUseCase)
+		}
+	}
+
+	for _, sc := range cases {
+		ctx := NewContext(c.Context)
+		var boolVal bool
+		if sc.guard != nil {
+			val, err := c.VM.Eval(ctx, sc.guard)
+			if err != nil {
+				c.FailWith = err
+				return
+			}
+			if err := c.VM.CastTo(ctx, val, &boolVal); err != nil {
+				c.FailWith = err
+			}
+		} else {
+			boolVal = true
+		}
+
+		if boolVal {
+			ctx = NewContext(c.Context)
+			c.ReturnValue, c.FailWith = c.VM.Eval(ctx, sc.body)
+			return
+		}
+	}
+}
+
+func MakeIdentityProcess(val ast.Argument) ProcessFunc {
+	return func(c *CallStack) {
+		c.ReturnValue = val
+	}
 }

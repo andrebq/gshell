@@ -32,6 +32,8 @@ type (
 		// Use to indcate that the function call failed
 		// and give it a reason
 		FailWith error
+
+		ReturnValue interface{}
 	}
 
 	Context struct {
@@ -49,6 +51,13 @@ type (
 var (
 	printlnSym = mustSym("println")
 	letSym     = mustSym("let")
+	switchSym  = mustSym("switch")
+	elseSym    = mustSym("else")
+	caseSym    = mustSym("case")
+	guardSym   = mustSym("guard")
+
+	trueSym  = mustSym("true")
+	falseSym = mustSym("false")
 
 	ErrChannelNotFound = errors.New("channel not found")
 )
@@ -72,6 +81,11 @@ func NewVM() *VM {
 	}
 	vm.builtins[printlnSym] = ProcessFunc(GShellPrintln)
 	vm.builtins[letSym] = ProcessFunc(GShellLetVariable)
+	vm.builtins[switchSym] = ProcessFunc(GShellSwitch)
+	vm.builtins[trueSym] = MakeIdentityProcess(trueSym)
+	vm.builtins[falseSym] = MakeIdentityProcess(falseSym)
+	vm.builtins[guardSym] = ProcessFunc(GShellGuard)
+
 	const defaultChanSize = 1000
 	vm.rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))
 	vm.rootCtx.Set(StdinChannel, make(chan Event, defaultChanSize))
@@ -99,26 +113,28 @@ func (v *VM) getDefaultChannel(name ast.Symbol) chan Event {
 	return ev.(chan Event)
 }
 
-func (v *VM) Run(code string) error {
+func (v *VM) Run(code string) (interface{}, error) {
 	ast, err := parser.Parse(code)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	ctx := NewContext(v.rootCtx)
 	return v.runScript(ctx, ast.Root())
 }
 
-func (v *VM) runScript(ctx *Context, sc *ast.Script) error {
+func (v *VM) runScript(ctx *Context, sc *ast.Script) (interface{}, error) {
+	var lastReturn interface{}
 	for _, c := range sc.Commands() {
-		err := v.runCommand(NewContext(ctx), c)
-		if err != nil {
-			return err
+		call := v.runCommand(ctx, c)
+		lastReturn = call.ReturnValue
+		if call.FailWith != nil {
+			return nil, call.FailWith
 		}
 	}
-	return nil
+	return lastReturn, nil
 }
 
-func (v *VM) runCommand(ctx *Context, cmd *ast.Cmd) error {
+func (v *VM) runCommand(ctx *Context, cmd *ast.Cmd) *CallStack {
 	call := &CallStack{
 		VM:      v,
 		RawArgs: cmd.Arguments(),
@@ -126,29 +142,30 @@ func (v *VM) runCommand(ctx *Context, cmd *ast.Cmd) error {
 	}
 	bt, found := v.builtins[cmd.Command()]
 	if found {
-		return v.callBuiltin(call, bt)
+		v.callBuiltin(call, bt)
+		return call
 	}
 	value, found := ctx.Get(cmd.Command())
 	if !found {
-		return fmt.Errorf("Command %v not found", cmd.Command().Text())
+		call.FailWith = fmt.Errorf("Command %v not found", cmd.Command().Text())
+		return call
 	}
-	return v.callValue(call, value)
+	v.callValue(call, value)
+	return call
 }
 
-func (v *VM) callValue(call *CallStack, value Value) error {
+func (v *VM) callValue(call *CallStack, value Value) {
 	switch value := value.(type) {
 	case Process:
 		value.Run(call)
 	default:
-		return fmt.Errorf("Value %q is not callable", value)
+		call.FailWith = fmt.Errorf("Value %q is not callable", value)
 	}
-	return call.FailWith
 }
 
-func (v *VM) callBuiltin(call *CallStack, value Process) error {
+func (v *VM) callBuiltin(call *CallStack, value Process) {
 	// things like for/if/let must be implemented as builtin
 	value.Run(call)
-	return call.FailWith
 }
 
 func (v *VM) PushValues(chname ast.Symbol, ctx *Context, values ...Value) bool {
@@ -176,7 +193,8 @@ func (v *VM) PushValues(chname ast.Symbol, ctx *Context, values ...Value) bool {
 func (v *VM) Eval(ctx *Context, a ast.Argument) (interface{}, error) {
 	switch a := a.(type) {
 	case ast.Symbol:
-		return a.Text(), nil
+		// a symbol always evaluates to itself
+		return a, nil
 	case ast.Number:
 		return a.Float64(), nil
 	case ast.Text:
@@ -187,6 +205,27 @@ func (v *VM) Eval(ctx *Context, a ast.Argument) (interface{}, error) {
 			return nil, fmt.Errorf("Variable %v is not defined", a)
 		}
 		return v, nil
+	case *ast.Script:
+		return v.runScript(ctx, a)
 	}
-	return nil, fmt.Errorf("cannot decode %v into a meangingful value", a)
+	return nil, fmt.Errorf("cannot decode %T into a meangingful value", a)
+}
+
+func (v *VM) CastTo(ctx *Context, input interface{}, out interface{}) error {
+	switch out := out.(type) {
+	case *bool:
+		return v.castToBool(ctx, input, out)
+	}
+	return errors.New("cast not allowed")
+}
+
+func (v *VM) castToBool(ctx *Context, input interface{}, out *bool) error {
+	*out = false
+	switch input := input.(type) {
+	case ast.Symbol:
+		*out = input == trueSym
+	default:
+		return fmt.Errorf("Cannot cast object of type %t to bool", input)
+	}
+	return nil
 }

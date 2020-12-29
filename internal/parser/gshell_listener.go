@@ -41,6 +41,9 @@ type GShellListener interface {
 	// EnterVariableArgument is called when entering the variableArgument production.
 	EnterVariableArgument(c *VariableArgumentContext)
 
+	// EnterScriptArgument is called when entering the scriptArgument production.
+	EnterScriptArgument(c *ScriptArgumentContext)
+
 	// ExitStart is called when exiting the start production.
 	ExitStart(c *StartContext)
 
@@ -73,4 +76,7 @@ type GShellListener interface {
 
 	// ExitVariableArgument is called when exiting the variableArgument production.
 	ExitVariableArgument(c *VariableArgumentContext)
+
+	// ExitScriptArgument is called when exiting the scriptArgument production.
+	ExitScriptArgument(c *ScriptArgumentContext)
 }

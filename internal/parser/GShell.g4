@@ -44,11 +44,13 @@ commandName : IDENTIFIER ;
 arguments
    : namedArgument arguments*
    | numericArgument arguments*
-   | variableArgument arguments*;
+   | variableArgument arguments*
+   | scriptArgument arguments*;
 
 namedArgument : IDENTIFIER ;
 numericArgument : NUMBER ;
 variableArgument : '$' IDENTIFIER ;
+scriptArgument: '{' commandListItem* '}' ;
 
 // expression
 //    : expression op=('*'|'/') expression # MulDiv

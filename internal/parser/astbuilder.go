@@ -74,6 +74,22 @@ func (ab *astBuilder) ExitScript(c *ScriptContext) {
 	ab.stack.push(sc)
 }
 
+func (ab *astBuilder) EnterScriptArgument(c *ScriptArgumentContext) {
+	ab.stack.push(ast.NewScript())
+}
+
+func (ab *astBuilder) ExitScriptArgument(c *ScriptArgumentContext) {
+	steps := new(stack)
+	for !isScript(ab.stack) {
+		steps.push(ab.stack.pop().(*ast.Cmd))
+	}
+	sc := ab.stack.pop().(*ast.Script)
+	for !steps.empty() {
+		sc.AddCommand(steps.pop().(*ast.Cmd))
+	}
+	ab.stack.push(sc)
+}
+
 func (ab *astBuilder) EnterSingleCommand(c *SingleCommandContext) {
 	ab.stack.push(&ast.Cmd{})
 }
