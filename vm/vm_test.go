@@ -88,6 +88,8 @@ func TestGuard(t *testing.T) {
 	_, err := vm.Run(`{
 		guard { false; } { println 0; }
 		guard { true; } { println 1; }
+		guard { true; } { let $a 10; }
+		println $a
 }`)
 	if err != nil {
 		t.Error(err)
@@ -98,6 +100,14 @@ func TestGuard(t *testing.T) {
 	case ev = <-out:
 		if !reflect.DeepEqual(ev.Main, fmt.Sprintf("1\n")) {
 			t.Errorf("Unexpected value %#v in stdout channel", ev.Main)
+		}
+	default:
+		t.Error("out channel should have at least one entry")
+	}
+	select {
+	case ev = <-out:
+		if !reflect.DeepEqual(ev.Main, fmt.Sprintf("10\n")) {
+			t.Errorf("Variable defined within a guard should be visible to the outer context. Got %v", ev.Main)
 		}
 	default:
 		t.Error("out channel should have at least one entry")

@@ -65,13 +65,13 @@ func GShellGuard(c *CallStack) {
 		return
 	}
 
-	ctx := NewContext(c.Context)
-	condEval, err := c.VM.runScript(ctx, cond)
+	condCtx := NewContext(c.Context)
+	condEval, err := c.VM.runScript(condCtx, cond)
 	if err != nil {
 		c.FailWith = err
 	}
 	var allowed bool
-	if err = c.VM.CastTo(ctx, condEval, &allowed); err != nil {
+	if err = c.VM.CastTo(condCtx, condEval, &allowed); err != nil {
 		c.FailWith = err
 	}
 	if !allowed {
@@ -79,7 +79,7 @@ func GShellGuard(c *CallStack) {
 		return
 	}
 
-	bodyEval, err := c.VM.runScript(ctx, body)
+	bodyEval, err := c.VM.runScript(c.Context, body)
 	if err != nil {
 		c.FailWith = err
 		return
