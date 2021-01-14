@@ -78,3 +78,19 @@ func Script(out **ast.Script) Condition {
 		return true
 	}
 }
+
+// AnySymbol matches against anything that is a Symbol
+func AnySymbol(out *ast.Symbol) Condition {
+	return func(args *[]ast.Argument) bool {
+		if len(*args) == 0 {
+			return false
+		}
+		aux, ok := (*args)[0].(ast.Symbol)
+		if !ok {
+			return false
+		}
+		*out = aux
+		*args = (*args)[1:]
+		return true
+	}
+}

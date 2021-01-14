@@ -55,6 +55,9 @@ var (
 	elseSym    = mustSym("else")
 	caseSym    = mustSym("case")
 	guardSym   = mustSym("guard")
+	fromSym    = mustSym("from")
+	toSym      = mustSym("to")
+	loop       = mustSym("loop")
 
 	trueSym  = mustSym("true")
 	falseSym = mustSym("false")
@@ -85,6 +88,7 @@ func NewVM() *VM {
 	vm.builtins[trueSym] = MakeIdentityProcess(trueSym)
 	vm.builtins[falseSym] = MakeIdentityProcess(falseSym)
 	vm.builtins[guardSym] = ProcessFunc(GShellGuard)
+	vm.builtins[loop] = ProcessFunc(GShellLoop)
 
 	const defaultChanSize = 1000
 	vm.rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))

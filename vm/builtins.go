@@ -151,6 +151,20 @@ func GShellSwitch(c *CallStack) {
 	}
 }
 
+func GShellLoop(c *CallStack) {
+	loopUsage := fmt.Sprintf("loop <variable-name> from <start-point> to <end-point> <{body}>")
+	var varName ast.Symbol
+	var fromArg, toArg ast.Argument
+	var body *ast.Script
+	guard := match.Guard(match.AnySymbol(&varName), match.Symbol(fromSym), match.Head(&fromArg),
+		match.Symbol(toSym), match.Head(&toArg), match.Script(&body))
+	if !match.Apply(&c.RawArgs, guard) {
+		c.FailWith = errors.New(loopUsage)
+		return
+	}
+	c.ReturnValue = trueSym
+}
+
 func MakeIdentityProcess(val ast.Argument) ProcessFunc {
 	return func(c *CallStack) {
 		c.ReturnValue = val

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/andrebq/gshell/ast"
 )
 
 func TestVM(t *testing.T) {
@@ -112,4 +114,41 @@ func TestGuard(t *testing.T) {
 	default:
 		t.Error("out channel should have at least one entry")
 	}
+}
+
+func TestSequenceLoop(t *testing.T) {
+	vm := NewVM()
+	_, err := vm.Run(`{
+		loop i from 1 to 5 {
+			println $i
+		}
+	}`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	actualEvents, err := readAtLeastEvents(vm.Stdout(), 5)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedEvents := []Value{
+		ast.NewText("1"),
+		ast.NewText("2"),
+		ast.NewText("3"),
+		ast.NewText("4"),
+		ast.NewText("5"),
+	}
+	if !reflect.DeepEqual(actualEvents, expectedEvents) {
+		t.Errorf("Expecting %v got %v", expectedEvents, actualEvents)
+	}
+}
+
+func readAtLeastEvents(in <-chan Event, n int) ([]Event, error) {
+	buf := make([]Event, 0, n)
+	select {
+	case ev := <-in:
+		buf = append(buf, ev)
+	default:
+		return buf, fmt.Errorf("Unable to read %v events from channel got %v", n, len(buf))
+	}
+	return buf, nil
 }
