@@ -37,12 +37,18 @@ type (
 		sym Symbol
 	}
 
+	List struct {
+		val  Argument
+		tail *List
+	}
+
 	Formatter interface {
 		Fmt(Printer)
 	}
 
 	Argument interface {
 		anchor()
+		Fmt(Printer)
 	}
 )
 

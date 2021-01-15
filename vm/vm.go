@@ -219,8 +219,18 @@ func (v *VM) CastTo(ctx *Context, input interface{}, out interface{}) error {
 	switch out := out.(type) {
 	case *bool:
 		return v.castToBool(ctx, input, out)
+	case *float64:
+		return v.castToFloat(ctx, input, out)
 	}
-	return errors.New("cast not allowed")
+	return fmt.Errorf("cast not allowed %T", out)
+}
+
+func (v *VM) EvalAndCast(ctx *Context, arg ast.Argument, out interface{}) error {
+	value, err := v.Eval(ctx, arg)
+	if err != nil {
+		return err
+	}
+	return v.CastTo(ctx, value, out)
 }
 
 func (v *VM) castToBool(ctx *Context, input interface{}, out *bool) error {
@@ -229,7 +239,28 @@ func (v *VM) castToBool(ctx *Context, input interface{}, out *bool) error {
 	case ast.Symbol:
 		*out = input == trueSym
 	default:
-		return fmt.Errorf("Cannot cast object of type %t to bool", input)
+		return fmt.Errorf("Cannot cast object of type %T to bool", input)
+	}
+	return nil
+}
+
+func (v *VM) castToFloat(ctx *Context, input interface{}, out *float64) error {
+	*out = 0
+	switch input := input.(type) {
+	case ast.Number:
+		*out = input.Float64()
+	case float64:
+		*out = input
+	case int64:
+		*out = float64(input)
+	case float32:
+		*out = float64(input)
+	case int32:
+		*out = float64(input)
+	case int:
+		*out = float64(input)
+	default:
+		return fmt.Errorf("Cannot cast object of type %T to float64", input)
 	}
 	return nil
 }

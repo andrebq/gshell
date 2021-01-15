@@ -30,6 +30,8 @@ var (
 			fmt: "{ println $variable; }"},
 		{subject: "can use blocks as arguments", code: "{ if true { println false; } else { println true; }; }",
 			fmt: "{ if true { println false; } else { println true; }; }"},
+		{subject: "can parse lists as argument", code: `{ echo [ 123  $abc identifier ]; }`,
+			fmt: `{ echo [ 123 $abc identifier ]; }`},
 	}
 )
 

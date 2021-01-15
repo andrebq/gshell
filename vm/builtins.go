@@ -162,7 +162,17 @@ func GShellLoop(c *CallStack) {
 		c.FailWith = errors.New(loopUsage)
 		return
 	}
-	c.ReturnValue = trueSym
+	var fromIdx, toIdx float64
+	c.FailWith = c.VM.EvalAndCast(c.Context, fromArg, &fromIdx)
+	if c.FailWith != nil {
+		return
+	}
+	c.FailWith = c.VM.EvalAndCast(c.Context, fromArg, &toIdx)
+	if c.FailWith != nil {
+		return
+	}
+
+	c.ReturnValue = ast.NilList()
 }
 
 func MakeIdentityProcess(val ast.Argument) ProcessFunc {

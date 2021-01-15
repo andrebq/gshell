@@ -28,7 +28,7 @@ terminator
 
 commandListItem
    : NL* singleCommand NL*;
-  
+
 script
    : '{' commandListItem* '}' EOF;
 
@@ -45,12 +45,14 @@ arguments
    : namedArgument arguments*
    | numericArgument arguments*
    | variableArgument arguments*
-   | scriptArgument arguments*;
+   | scriptArgument arguments*
+   | listArgument arguments*;
 
 namedArgument : IDENTIFIER ;
 numericArgument : NUMBER ;
 variableArgument : '$' IDENTIFIER ;
 scriptArgument: '{' commandListItem* '}' ;
+listArgument: '[' arguments ']' ;
 
 // expression
 //    : expression op=('*'|'/') expression # MulDiv

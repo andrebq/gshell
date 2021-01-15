@@ -92,3 +92,9 @@ func (s *BaseGShellListener) EnterScriptArgument(ctx *ScriptArgumentContext) {}
 
 // ExitScriptArgument is called when production scriptArgument is exited.
 func (s *BaseGShellListener) ExitScriptArgument(ctx *ScriptArgumentContext) {}
+
+// EnterListArgument is called when production listArgument is entered.
+func (s *BaseGShellListener) EnterListArgument(ctx *ListArgumentContext) {}
+
+// ExitListArgument is called when production listArgument is exited.
+func (s *BaseGShellListener) ExitListArgument(ctx *ListArgumentContext) {}

@@ -149,6 +149,24 @@ func (ab *astBuilder) ExitVariableArgument(c *VariableArgumentContext) {
 	ab.stack.push(v)
 }
 
+type listStartMarker struct{}
+
+func (ab *astBuilder) EnterListArgument(c *ListArgumentContext) {
+	ab.stack.push(listStartMarker{})
+}
+
+func (ab *astBuilder) ExitListArgument(c *ListArgumentContext) {
+	lst := ast.NilList()
+	for !ab.stack.empty() {
+		v := ab.stack.pop()
+		if _, isListStart := v.(listStartMarker); isListStart {
+			break
+		}
+		lst = ast.Cons(v.(ast.Argument), lst)
+	}
+	ab.stack.push(lst)
+}
+
 func (s *stack) push(v interface{}) {
 	*s = append(*s, v)
 }
