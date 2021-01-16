@@ -126,29 +126,31 @@ func TestSequenceLoop(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	actualEvents, err := readAtLeastEvents(vm.Stdout(), 5)
+	actualEvents, err := extractAtLeastValues(vm.Stdout(), 5)
 	if err != nil {
 		t.Fatal(err)
 	}
 	expectedEvents := []Value{
-		ast.NewText("1"),
-		ast.NewText("2"),
-		ast.NewText("3"),
-		ast.NewText("4"),
-		ast.NewText("5"),
+		ast.NewText("1\n"),
+		ast.NewText("2\n"),
+		ast.NewText("3\n"),
+		ast.NewText("4\n"),
+		ast.NewText("5\n"),
 	}
 	if !reflect.DeepEqual(actualEvents, expectedEvents) {
-		t.Errorf("Expecting %v got %v", expectedEvents, actualEvents)
+		t.Errorf("Expecting %#v got %#v", expectedEvents, actualEvents)
 	}
 }
 
-func readAtLeastEvents(in <-chan Event, n int) ([]Event, error) {
-	buf := make([]Event, 0, n)
-	select {
-	case ev := <-in:
-		buf = append(buf, ev)
-	default:
-		return buf, fmt.Errorf("Unable to read %v events from channel got %v", n, len(buf))
+func extractAtLeastValues(in <-chan Event, n int) ([]Value, error) {
+	buf := make([]Value, 0, n)
+	for len(buf) < n {
+		select {
+		case ev := <-in:
+			buf = append(buf, ev.Main)
+		default:
+			return buf, fmt.Errorf("Unable to read %v events from channel got %v", n, len(buf))
+		}
 	}
 	return buf, nil
 }

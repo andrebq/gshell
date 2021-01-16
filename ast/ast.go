@@ -5,6 +5,8 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+
+	"github.com/andrebq/gshell/internal/pdata"
 )
 
 type (
@@ -38,8 +40,7 @@ type (
 	}
 
 	List struct {
-		val  Argument
-		tail *List
+		data *pdata.ArgumentListSlice
 	}
 
 	Formatter interface {
@@ -48,7 +49,7 @@ type (
 
 	Argument interface {
 		anchor()
-		Fmt(Printer)
+		Formatter
 	}
 )
 

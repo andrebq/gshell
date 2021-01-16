@@ -1,4 +1,4 @@
-.PHONY: watch build tidy
+.PHONY: watch build tidy deps gogen
 
 build:
 	go build ./...
@@ -9,3 +9,9 @@ tidy:
 
 watch:
 	modd
+
+deps:
+	go get -u github.com/tobgu/peds/cmd/peds
+
+gogen:
+	go generate ./...

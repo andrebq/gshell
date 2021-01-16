@@ -162,9 +162,9 @@ func (ab *astBuilder) ExitListArgument(c *ListArgumentContext) {
 		if _, isListStart := v.(listStartMarker); isListStart {
 			break
 		}
-		lst = ast.Cons(v.(ast.Argument), lst)
+		lst = lst.Append(v.(ast.Argument))
 	}
-	ab.stack.push(lst)
+	ab.stack.push(lst.Reverse())
 }
 
 func (s *stack) push(v interface{}) {
