@@ -1,7 +1,10 @@
-.PHONY: watch build tidy deps gogen
+.PHONY: watch build tidy deps gogen test
 
 build:
 	go build ./...
+
+test: build
+	go test ./...
 
 tidy:
 	go fmt ./...

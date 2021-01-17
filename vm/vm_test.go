@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
-
-	"github.com/andrebq/gshell/ast"
 )
 
 func TestVM(t *testing.T) {
@@ -131,14 +129,14 @@ func TestSequenceLoop(t *testing.T) {
 		t.Fatal(err)
 	}
 	expectedEvents := []Value{
-		ast.NewText("1\n"),
-		ast.NewText("2\n"),
-		ast.NewText("3\n"),
-		ast.NewText("4\n"),
-		ast.NewText("5\n"),
+		"1\n",
+		"2\n",
+		"3\n",
+		"4\n",
+		"5\n",
 	}
 	if !reflect.DeepEqual(actualEvents, expectedEvents) {
-		t.Errorf("Expecting %#v got %#v", expectedEvents, actualEvents)
+		t.Errorf("Expecting %#v got %#ev", expectedEvents, actualEvents)
 	}
 }
 
