@@ -16,6 +16,8 @@ type (
 
 var (
 	allTests = []testCase{
+		{subject: "test empty command blocks", code: "{}", fmt: "{}"},
+		{subject: "test last command does not require terminator", code: "{ hello world }", fmt: "{ hello world; }"},
 		{subject: "test single line commands", code: "{ echo hello world; }", fmt: "{ echo hello world; }"},
 		{subject: "test multiple command single line", code: "{ echo hello world; echo ola mundo; } ", fmt: "{\n\techo hello world\n\techo ola mundo\n}"},
 		{subject: "test multiple command multiple lines", code: `{
@@ -37,7 +39,6 @@ var (
 
 func TestParser(t *testing.T) {
 	runTestCase := func(t *testing.T, tc testCase) {
-		t.Logf("Test subject: %v", tc.subject)
 		code := tc.code
 		ast, err := Parse(code)
 		if err != tc.expectedError {
@@ -50,10 +51,10 @@ func TestParser(t *testing.T) {
 		}
 		secondAst, err := Parse(fmtAst)
 		if err != tc.expectedError {
-			t.Errorf("Formatted error caused a different error: %v", err)
+			t.Errorf("Case: %v Formatted error caused a different error: %v", tc.subject, err)
 		}
 		if !reflect.DeepEqual(ast, secondAst) {
-			t.Errorf("Generated AST's do not match")
+			t.Errorf("Case: %v Generated AST's do not match", tc.subject)
 		}
 	}
 

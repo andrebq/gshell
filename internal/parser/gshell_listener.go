@@ -17,6 +17,18 @@ type GShellListener interface {
 	// EnterCommandListItem is called when entering the commandListItem production.
 	EnterCommandListItem(c *CommandListItemContext)
 
+	// EnterOpenBlock is called when entering the openBlock production.
+	EnterOpenBlock(c *OpenBlockContext)
+
+	// EnterCloseBlock is called when entering the closeBlock production.
+	EnterCloseBlock(c *CloseBlockContext)
+
+	// EnterCommandBlock is called when entering the commandBlock production.
+	EnterCommandBlock(c *CommandBlockContext)
+
+	// EnterCommandBlockTail is called when entering the commandBlockTail production.
+	EnterCommandBlockTail(c *CommandBlockTailContext)
+
 	// EnterScript is called when entering the script production.
 	EnterScript(c *ScriptContext)
 
@@ -55,6 +67,18 @@ type GShellListener interface {
 
 	// ExitCommandListItem is called when exiting the commandListItem production.
 	ExitCommandListItem(c *CommandListItemContext)
+
+	// ExitOpenBlock is called when exiting the openBlock production.
+	ExitOpenBlock(c *OpenBlockContext)
+
+	// ExitCloseBlock is called when exiting the closeBlock production.
+	ExitCloseBlock(c *CloseBlockContext)
+
+	// ExitCommandBlock is called when exiting the commandBlock production.
+	ExitCommandBlock(c *CommandBlockContext)
+
+	// ExitCommandBlockTail is called when exiting the commandBlockTail production.
+	ExitCommandBlockTail(c *CommandBlockTailContext)
 
 	// ExitScript is called when exiting the script production.
 	ExitScript(c *ScriptContext)

@@ -39,6 +39,30 @@ func (s *BaseGShellListener) EnterCommandListItem(ctx *CommandListItemContext) {
 // ExitCommandListItem is called when production commandListItem is exited.
 func (s *BaseGShellListener) ExitCommandListItem(ctx *CommandListItemContext) {}
 
+// EnterOpenBlock is called when production openBlock is entered.
+func (s *BaseGShellListener) EnterOpenBlock(ctx *OpenBlockContext) {}
+
+// ExitOpenBlock is called when production openBlock is exited.
+func (s *BaseGShellListener) ExitOpenBlock(ctx *OpenBlockContext) {}
+
+// EnterCloseBlock is called when production closeBlock is entered.
+func (s *BaseGShellListener) EnterCloseBlock(ctx *CloseBlockContext) {}
+
+// ExitCloseBlock is called when production closeBlock is exited.
+func (s *BaseGShellListener) ExitCloseBlock(ctx *CloseBlockContext) {}
+
+// EnterCommandBlock is called when production commandBlock is entered.
+func (s *BaseGShellListener) EnterCommandBlock(ctx *CommandBlockContext) {}
+
+// ExitCommandBlock is called when production commandBlock is exited.
+func (s *BaseGShellListener) ExitCommandBlock(ctx *CommandBlockContext) {}
+
+// EnterCommandBlockTail is called when production commandBlockTail is entered.
+func (s *BaseGShellListener) EnterCommandBlockTail(ctx *CommandBlockTailContext) {}
+
+// ExitCommandBlockTail is called when production commandBlockTail is exited.
+func (s *BaseGShellListener) ExitCommandBlockTail(ctx *CommandBlockTailContext) {}
+
 // EnterScript is called when production script is entered.
 func (s *BaseGShellListener) EnterScript(ctx *ScriptContext) {}
 
