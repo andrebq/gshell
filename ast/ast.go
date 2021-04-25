@@ -111,7 +111,6 @@ func (s *Script) Fmt(p Printer) {
 	case 1:
 		p.WriteString(" ")
 		s.cmds[0].Fmt(p)
-		p.WriteInlineTerminator()
 		p.WriteString(" }")
 		return
 	default:

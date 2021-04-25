@@ -17,23 +17,28 @@ type (
 var (
 	allTests = []testCase{
 		{subject: "test empty command blocks", code: "{}", fmt: "{}"},
-		{subject: "test last command does not require terminator", code: "{ hello world }", fmt: "{ hello world; }"},
-		{subject: "test single line commands", code: "{ echo hello world; }", fmt: "{ echo hello world; }"},
-		{subject: "test multiple command single line", code: "{ echo hello world; echo ola mundo; } ", fmt: "{\n\techo hello world\n\techo ola mundo\n}"},
+		{subject: "test last command does not require terminator", code: "{ hello world }", fmt: "{ hello world }"},
+		{subject: "test single line commands", code: "{ echo hello world; }", fmt: "{ echo hello world }"},
+		{subject: "test multiple command single line", code: "{ echo hello world; echo ola mundo } ", fmt: "{\n\techo hello world\n\techo ola mundo\n}"},
 		{subject: "test multiple command multiple lines", code: `{
 	echo hello world
 	echo ola mundo
 }`, fmt: "{\n\techo hello world\n\techo ola mundo\n}"},
-		{subject: "test numeric arguments", code: "{echo 123 world123 w123h; }",
-			fmt: "{ echo 123 world123 w123h; }"},
-		{subject: "symbols have separators", code: "{ echo-1! should.be.valid; }",
-			fmt: "{ echo-1! should.be.valid; }"},
-		{subject: "can use variables as arguments", code: "{println $variable; }",
-			fmt: "{ println $variable; }"},
-		{subject: "can use blocks as arguments", code: "{ if true { println false; } else { println true; }; }",
-			fmt: "{ if true { println false; } else { println true; }; }"},
-		{subject: "can parse lists as argument", code: `{ echo [ 123  $abc identifier ]; }`,
-			fmt: `{ echo [ 123 $abc identifier ]; }`},
+		{subject: "test numeric arguments",
+			code: "{echo 123 world123 w123h; }",
+			fmt:  "{ echo 123 world123 w123h }"},
+		{subject: "symbols have separators",
+			code: "{ echo-1! should.be.valid }",
+			fmt:  "{ echo-1! should.be.valid }"},
+		{subject: "can use variables as arguments",
+			code: "{println $variable }",
+			fmt:  "{ println $variable }"},
+		{subject: "can use blocks as arguments",
+			code: "{ if true { println false; } else { println true; } }",
+			fmt:  "{ if true { println false } else { println true } }"},
+		{subject: "can parse lists as argument",
+			code: `{ echo [ 123  $abc identifier ] }`,
+			fmt:  `{ echo [ 123 $abc identifier ] }`},
 	}
 )
 
