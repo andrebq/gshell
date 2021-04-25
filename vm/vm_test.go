@@ -113,3 +113,42 @@ func TestGuard(t *testing.T) {
 		t.Error("out channel should have at least one entry")
 	}
 }
+
+func TestSequenceLoop(t *testing.T) {
+	vm := NewVM()
+	_, err := vm.Run(`{
+		loop i from 1 to 5 {
+			println $i
+		}
+	}`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	actualEvents, err := extractAtLeastValues(vm.Stdout(), 5)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedEvents := []Value{
+		"1\n",
+		"2\n",
+		"3\n",
+		"4\n",
+		"5\n",
+	}
+	if !reflect.DeepEqual(actualEvents, expectedEvents) {
+		t.Errorf("Expecting %#v got %#ev", expectedEvents, actualEvents)
+	}
+}
+
+func extractAtLeastValues(in <-chan Event, n int) ([]Value, error) {
+	buf := make([]Value, 0, n)
+	for len(buf) < n {
+		select {
+		case ev := <-in:
+			buf = append(buf, ev.Main)
+		default:
+			return buf, fmt.Errorf("Unable to read %v events from channel got %v", n, len(buf))
+		}
+	}
+	return buf, nil
+}

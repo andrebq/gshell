@@ -5,6 +5,8 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+
+	"github.com/andrebq/gshell/internal/pdata"
 )
 
 type (
@@ -37,12 +39,17 @@ type (
 		sym Symbol
 	}
 
+	List struct {
+		data *pdata.ArgumentListSlice
+	}
+
 	Formatter interface {
 		Fmt(Printer)
 	}
 
 	Argument interface {
 		anchor()
+		Formatter
 	}
 )
 
@@ -104,7 +111,6 @@ func (s *Script) Fmt(p Printer) {
 	case 1:
 		p.WriteString(" ")
 		s.cmds[0].Fmt(p)
-		p.WriteInlineTerminator()
 		p.WriteString(" }")
 		return
 	default:

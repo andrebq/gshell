@@ -27,13 +27,28 @@ terminator
    | NL ;
 
 commandListItem
-   : NL* singleCommand NL*;
-  
+   : NL* singleCommand terminator NL*;
+
+openBlock
+   : '{';
+
+closeBlock
+   : '}';
+
+commandBlock
+   //: openBlock commandListItem* closeBlock
+   : openBlock commandBlockTail;
+
+commandBlockTail
+   : NL* singleCommand terminator NL* commandBlockTail
+   | NL* singleCommand NL* closeBlock
+   | closeBlock;
+
 script
-   : '{' commandListItem* '}' EOF;
+   : commandBlock EOF;
 
 singleCommand
-   : commandLine terminator ;
+   : commandLine ;
 
 commandLine
    : commandName
@@ -45,12 +60,14 @@ arguments
    : namedArgument arguments*
    | numericArgument arguments*
    | variableArgument arguments*
-   | scriptArgument arguments*;
+   | scriptArgument arguments*
+   | listArgument arguments*;
 
 namedArgument : IDENTIFIER ;
 numericArgument : NUMBER ;
 variableArgument : '$' IDENTIFIER ;
-scriptArgument: '{' commandListItem* '}' ;
+scriptArgument: commandBlock ;
+listArgument: '[' arguments ']' ;
 
 // expression
 //    : expression op=('*'|'/') expression # MulDiv

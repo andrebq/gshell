@@ -151,6 +151,48 @@ func GShellSwitch(c *CallStack) {
 	}
 }
 
+func GShellLoop(c *CallStack) {
+	loopUsage := fmt.Sprintf("loop <variable-name> from <start-point> to <end-point> <{body}>")
+	var varName ast.Symbol
+	var fromArg, toArg ast.Argument
+	var body *ast.Script
+	guard := match.Guard(match.AnySymbol(&varName), match.Symbol(fromSym), match.Head(&fromArg),
+		match.Symbol(toSym), match.Head(&toArg), match.Script(&body))
+	if !match.Apply(&c.RawArgs, guard) {
+		c.FailWith = errors.New(loopUsage)
+		return
+	}
+	var fromIdx, toIdx float64
+	c.FailWith = c.VM.EvalAndCast(c.Context, fromArg, &fromIdx)
+	if c.FailWith != nil {
+		return
+	}
+	c.FailWith = c.VM.EvalAndCast(c.Context, toArg, &toIdx)
+	if c.FailWith != nil {
+		return
+	}
+	rev := fromIdx > toIdx
+
+	lst := ast.NilList()
+	for (rev && fromIdx >= toIdx) || (!rev && fromIdx <= toIdx) {
+		ctx := NewContext(c.Context)
+		ctx.Set(varName, ast.NewNumber(fromIdx))
+		val, err := c.VM.Eval(ctx, body)
+		if err != nil {
+			c.FailWith = err
+			return
+		}
+		lst = lst.Append(val.(ast.Argument))
+
+		if rev {
+			fromIdx--
+		} else {
+			fromIdx++
+		}
+	}
+	c.ReturnValue = lst
+}
+
 func MakeIdentityProcess(val ast.Argument) ProcessFunc {
 	return func(c *CallStack) {
 		c.ReturnValue = val
