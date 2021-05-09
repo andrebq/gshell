@@ -193,6 +193,47 @@ func GShellLoop(c *CallStack) {
 	c.ReturnValue = lst
 }
 
+func GShellFunc(c *CallStack) {
+	// for now, let's just now allow functions to define functions
+	// this is cutting on the capability of creating closures
+	// which is kind of important on a purely immutable language...
+	//
+	// but bash doesn't have it and it kinda works ok there :-)
+	// so no fancy schmancy high-order functions for you!
+	if c.Context.isFunction {
+		c.FailWith = errors.New("Functions cannot define other functions... sorry :(")
+		return
+	}
+	funcUsage := fmt.Sprintf("func <function-name> [<variable list>]  <{function body}>")
+	var funcName ast.Symbol
+	var argList *ast.List
+	var body *ast.Script
+	guard := match.Guard(match.AnySymbol(&funcName),
+		match.List(&argList),
+		match.Script(&body))
+	if !match.Apply(&c.RawArgs, guard) {
+		c.FailWith = errors.New(funcUsage)
+		return
+	}
+
+	cm := c.VM.currentModule
+	module := c.VM.modules[c.VM.currentModule]
+	if module == nil {
+		c.FailWith = errors.New("VM does not have a current module therefore a function cannot be defined")
+		return
+	}
+
+	if _, defined := module.definitions[funcName]; defined {
+		c.FailWith = fmt.Errorf("Module %v already contains a function called %v.", cm, funcName)
+		return
+	}
+
+	fn := c.VM.newFunction(c.Context, cm, funcName, argList, body)
+	module.definitions[funcName] = fn
+	c.ReturnValue = fn
+	return
+}
+
 func MakeIdentityProcess(val ast.Argument) ProcessFunc {
 	return func(c *CallStack) {
 		c.ReturnValue = val

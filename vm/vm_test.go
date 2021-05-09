@@ -152,3 +152,27 @@ func extractAtLeastValues(in <-chan Event, n int) ([]Value, error) {
 	}
 	return buf, nil
 }
+
+func TestFunctionDefinition(t *testing.T) {
+	vm := NewVM()
+	_, err := vm.Run(`{
+		func print-a-and-b [$a $b] {
+			println $a $b
+		}
+		print-a-and-b 10 20
+}`)
+	if err != nil {
+		t.Errorf("Unable to call-func with parameters: %v", err)
+	} else {
+		out := vm.Stdout()
+		var ev Event
+		select {
+		case ev = <-out:
+			if !reflect.DeepEqual(ev.Main, fmt.Sprintf("10 20\n")) {
+				t.Errorf("Unexpected value %#v in stdout channel", ev.Main)
+			}
+		default:
+			t.Error("out channel should have at least one entry")
+		}
+	}
+}

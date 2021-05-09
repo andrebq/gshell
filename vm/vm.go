@@ -13,8 +13,15 @@ type (
 	VM struct {
 		builtins map[ast.Symbol]Process
 
-		chlock  sync.RWMutex
-		rootCtx *Context
+		modules map[ast.Symbol]*Module
+
+		chlock        sync.RWMutex
+		rootCtx       *Context
+		currentModule ast.Symbol
+	}
+
+	Module struct {
+		definitions map[ast.Symbol]Value
 	}
 
 	Value interface{}
@@ -37,8 +44,9 @@ type (
 	}
 
 	Context struct {
-		parent *Context
-		refs   map[ast.Symbol]Value
+		parent     *Context
+		refs       map[ast.Symbol]Value
+		isFunction bool
 	}
 
 	Process interface {
@@ -58,9 +66,12 @@ var (
 	fromSym    = mustSym("from")
 	toSym      = mustSym("to")
 	loop       = mustSym("loop")
+	funcSym    = mustSym("func")
 
 	trueSym  = mustSym("true")
 	falseSym = mustSym("false")
+
+	mainModuleSym = mustSym("main")
 
 	ErrChannelNotFound = errors.New("channel not found")
 )
@@ -77,10 +88,20 @@ func mustSym(s string) ast.Symbol {
 	return sym
 }
 
+func EmptyModule() *Module {
+	return &Module{
+		definitions: make(map[ast.Symbol]Value),
+	}
+}
+
 func NewVM() *VM {
 	vm := &VM{
 		builtins: make(map[ast.Symbol]Process),
-		rootCtx:  NewContext(nil),
+		modules: map[ast.Symbol]*Module{
+			mainModuleSym: EmptyModule(),
+		},
+		rootCtx:       NewContext(nil),
+		currentModule: mainModuleSym,
 	}
 	vm.builtins[printlnSym] = ProcessFunc(GShellPrintln)
 	vm.builtins[letSym] = ProcessFunc(GShellLetVariable)
@@ -89,6 +110,7 @@ func NewVM() *VM {
 	vm.builtins[falseSym] = MakeIdentityProcess(falseSym)
 	vm.builtins[guardSym] = ProcessFunc(GShellGuard)
 	vm.builtins[loop] = ProcessFunc(GShellLoop)
+	vm.builtins[funcSym] = ProcessFunc(GShellFunc)
 
 	const defaultChanSize = 1000
 	vm.rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))
@@ -149,6 +171,11 @@ func (v *VM) runCommand(ctx *Context, cmd *ast.Cmd) *CallStack {
 		v.callBuiltin(call, bt)
 		return call
 	}
+	moduleFunc, found := v.modules[v.currentModule].definitions[cmd.Command()]
+	if found {
+		v.callFunction(call, moduleFunc.(*function))
+		return call
+	}
 	value, found := ctx.Get(cmd.Command())
 	if !found {
 		call.FailWith = fmt.Errorf("Command %v not found", cmd.Command().Text())
@@ -156,6 +183,10 @@ func (v *VM) runCommand(ctx *Context, cmd *ast.Cmd) *CallStack {
 	}
 	v.callValue(call, value)
 	return call
+}
+
+func (v *VM) callFunction(call *CallStack, value *function) {
+	call.FailWith = fmt.Errorf("Function exists but I cannot process it")
 }
 
 func (v *VM) callValue(call *CallStack, value Value) {
@@ -263,4 +294,13 @@ func (v *VM) castToFloat(ctx *Context, input interface{}, out *float64) error {
 		return fmt.Errorf("Cannot cast object of type %T to float64", input)
 	}
 	return nil
+}
+
+func (v *VM) newFunction(ctx *Context, module, name ast.Symbol, args *ast.List, script *ast.Script) *function {
+	return &function{
+		module:   module,
+		upvalues: ctx,
+		args:     args,
+		body:     script,
+	}
 }

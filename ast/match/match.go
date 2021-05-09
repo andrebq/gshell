@@ -33,6 +33,22 @@ func Guard(conditions ...Condition) Condition {
 	}
 }
 
+// List returns the first ast.Argument as a List
+func List(out **ast.List) Condition {
+	return func(args *[]ast.Argument) bool {
+		if len(*args) == 0 {
+			return false
+		}
+		list, ok := (*args)[0].(*ast.List)
+		if !ok {
+			return false
+		}
+		*args = (*args)[1:]
+		*out = list
+		return true
+	}
+}
+
 // Head value from args and set its content to out,
 // returns true if len(args) >= 0
 //
