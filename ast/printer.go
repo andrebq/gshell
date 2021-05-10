@@ -1,6 +1,8 @@
 package ast
 
-import "io"
+import (
+	"io"
+)
 
 type (
 	Printer interface {
@@ -20,6 +22,13 @@ type (
 		err     error
 	}
 )
+
+func NewPrinter(out io.Writer) Printer {
+	p := &printer{
+		out: out,
+	}
+	return p
+}
 
 func (p *printer) Indent() {
 	p.nesting++

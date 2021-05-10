@@ -49,6 +49,31 @@ func List(out **ast.List) Condition {
 	}
 }
 
+// ListOf returns the first ast.Argument as a List
+// if, and only if, filter returns true for all elements
+func ListOf(out **ast.List, condition func(ast.Argument) bool) Condition {
+	return func(args *[]ast.Argument) bool {
+		if len(*args) == 0 {
+			return false
+		}
+		list, ok := (*args)[0].(*ast.List)
+		if !ok {
+			return false
+		}
+		valid := true
+		list.ForEach(func(a ast.Argument) bool {
+			valid = valid && condition(a)
+			return valid
+		})
+		if !valid {
+			return false
+		}
+		*args = (*args)[1:]
+		*out = list
+		return true
+	}
+}
+
 // Head value from args and set its content to out,
 // returns true if len(args) >= 0
 //

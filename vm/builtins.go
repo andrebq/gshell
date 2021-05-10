@@ -66,7 +66,7 @@ func GShellGuard(c *CallStack) {
 	}
 
 	condCtx := NewContext(c.Context)
-	condEval, err := c.VM.runScript(condCtx, cond)
+	condEval, err := c.VM.evalScript(condCtx, cond)
 	if err != nil {
 		c.FailWith = err
 	}
@@ -79,7 +79,7 @@ func GShellGuard(c *CallStack) {
 		return
 	}
 
-	bodyEval, err := c.VM.runScript(c.Context, body)
+	bodyEval, err := c.VM.evalScript(c.Context, body)
 	if err != nil {
 		c.FailWith = err
 		return
@@ -209,7 +209,10 @@ func GShellFunc(c *CallStack) {
 	var argList *ast.List
 	var body *ast.Script
 	guard := match.Guard(match.AnySymbol(&funcName),
-		match.List(&argList),
+		match.ListOf(&argList, func(a ast.Argument) bool {
+			_, isVar := a.(ast.Var)
+			return isVar
+		}),
 		match.Script(&body))
 	if !match.Apply(&c.RawArgs, guard) {
 		c.FailWith = errors.New(funcUsage)

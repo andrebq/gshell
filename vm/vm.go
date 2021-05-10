@@ -145,11 +145,33 @@ func (v *VM) Run(code string) (interface{}, error) {
 		return nil, err
 	}
 	ctx := NewContext(v.rootCtx)
-	return v.runScript(ctx, ast.Root())
+	return v.evalScript(ctx, ast.Root())
 }
 
-func (v *VM) runScript(ctx *Context, sc *ast.Script) (interface{}, error) {
-	var lastReturn interface{}
+func (v *VM) evalList(ctx *Context, lst *ast.List) (*ast.List, error) {
+	output := ast.NilList()
+	var err error
+	lst.ForEach(func(a ast.Argument) bool {
+		var value Value
+		value, err = v.Eval(ctx, a)
+		if err != nil {
+			return false
+		}
+		var arg ast.Argument
+		arg, err = ast.EncodeValue(value)
+		if err != nil {
+			return false
+		}
+		// this is very slow but I'm too lazy
+		// to use a slice
+		output = output.Append(arg)
+		return true
+	})
+	return output, err
+}
+
+func (v *VM) evalScript(ctx *Context, sc *ast.Script) (Value, error) {
+	var lastReturn Value
 	for _, c := range sc.Commands() {
 		call := v.runCommand(ctx, c)
 		lastReturn = call.ReturnValue
@@ -185,8 +207,23 @@ func (v *VM) runCommand(ctx *Context, cmd *ast.Cmd) *CallStack {
 	return call
 }
 
-func (v *VM) callFunction(call *CallStack, value *function) {
-	call.FailWith = fmt.Errorf("Function exists but I cannot process it")
+func (v *VM) callFunction(call *CallStack, funcDeclaration *function) {
+	ctx := NewFunctionContext(call.Context)
+	if len(funcDeclaration.args) != len(call.RawArgs) {
+		call.FailWith = fmt.Errorf("Function %v requires %v args got %v", funcDeclaration.name, len(funcDeclaration.args), len(call.RawArgs))
+		return
+	}
+	for i := range call.RawArgs {
+		var err error
+		var argValue Value
+		argValue, err = v.Eval(call.Context, call.RawArgs[i])
+		if err != nil {
+			call.FailWith = err
+			return
+		}
+		ctx.Set(funcDeclaration.args[i].Name(), argValue)
+	}
+	v.evalScript(ctx, funcDeclaration.body)
 }
 
 func (v *VM) callValue(call *CallStack, value Value) {
@@ -241,7 +278,9 @@ func (v *VM) Eval(ctx *Context, a ast.Argument) (interface{}, error) {
 		}
 		return v, nil
 	case *ast.Script:
-		return v.runScript(ctx, a)
+		return v.evalScript(ctx, a)
+	case *ast.List:
+		return v.evalList(ctx, a)
 	}
 	return nil, fmt.Errorf("cannot decode %T into a meangingful value", a)
 }
@@ -297,10 +336,15 @@ func (v *VM) castToFloat(ctx *Context, input interface{}, out *float64) error {
 }
 
 func (v *VM) newFunction(ctx *Context, module, name ast.Symbol, args *ast.List, script *ast.Script) *function {
+	var items []ast.Var
+	args.ForEach(func(a ast.Argument) bool {
+		items = append(items, a.(ast.Var))
+		return true
+	})
 	return &function{
 		module:   module,
 		upvalues: ctx,
-		args:     args,
+		args:     items,
 		body:     script,
 	}
 }

@@ -159,7 +159,7 @@ func TestFunctionDefinition(t *testing.T) {
 		func print-a-and-b [$a $b] {
 			println $a $b
 		}
-		print-a-and-b 10 20
+		print-a-and-b 10 [10 20]
 }`)
 	if err != nil {
 		t.Errorf("Unable to call-func with parameters: %v", err)
@@ -168,7 +168,7 @@ func TestFunctionDefinition(t *testing.T) {
 		var ev Event
 		select {
 		case ev = <-out:
-			if !reflect.DeepEqual(ev.Main, fmt.Sprintf("10 20\n")) {
+			if !reflect.DeepEqual(ev.Main, fmt.Sprintf("10 [ 10 20 ]\n")) {
 				t.Errorf("Unexpected value %#v in stdout channel", ev.Main)
 			}
 		default:

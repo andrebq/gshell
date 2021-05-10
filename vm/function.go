@@ -7,7 +7,7 @@ type (
 		module   ast.Symbol
 		upvalues *Context
 		name     ast.Symbol
-		args     *ast.List
+		args     []ast.Var
 		body     *ast.Script
 	}
 )
