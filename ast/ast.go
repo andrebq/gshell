@@ -142,10 +142,8 @@ func (a *Ast) Fmt(p Printer) {
 func (a *Ast) Root() *Script { return a.root }
 
 func (a *Ast) String() string {
-	buf := &bytes.Buffer{}
-	p := &printer{
-		out: buf,
-	}
+	buf := bytes.Buffer{}
+	p := NewPrinter(&buf)
 	a.Fmt(p)
 	if p.Err() != nil {
 		return "!invalid-ast"

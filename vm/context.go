@@ -4,9 +4,25 @@ import "github.com/andrebq/gshell/ast"
 
 func NewContext(parent *Context) *Context {
 	return &Context{
-		parent: parent,
-		refs:   make(map[ast.Symbol]Value),
+		parent:     parent,
+		refs:       make(map[ast.Symbol]Value),
+		isFunction: parent.IsFunction(),
 	}
+}
+
+func NewFunctionContext(parent *Context) *Context {
+	return &Context{
+		parent:     parent,
+		refs:       make(map[ast.Symbol]Value),
+		isFunction: true,
+	}
+}
+
+func (c *Context) IsFunction() bool {
+	if c == nil {
+		return false
+	}
+	return c.isFunction || c.parent.IsFunction()
 }
 
 func (c *Context) Set(sym ast.Symbol, v Value) {

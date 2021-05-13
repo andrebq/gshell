@@ -15,73 +15,72 @@ var _ = fmt.Printf
 var _ = reflect.Copy
 var _ = strconv.Itoa
 
-
 var parserATN = []uint16{
-	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 12, 160, 
-	4, 2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 
-	4, 8, 9, 8, 4, 9, 9, 9, 4, 10, 9, 10, 4, 11, 9, 11, 4, 12, 9, 12, 4, 13, 
-	9, 13, 4, 14, 9, 14, 4, 15, 9, 15, 4, 16, 9, 16, 4, 17, 9, 17, 4, 18, 9, 
-	18, 3, 2, 3, 2, 3, 2, 3, 3, 3, 3, 3, 4, 7, 4, 43, 10, 4, 12, 4, 14, 4, 
-	46, 11, 4, 3, 4, 3, 4, 3, 4, 7, 4, 51, 10, 4, 12, 4, 14, 4, 54, 11, 4, 
-	3, 5, 3, 5, 3, 6, 3, 6, 3, 7, 3, 7, 3, 7, 3, 8, 7, 8, 64, 10, 8, 12, 8, 
-	14, 8, 67, 11, 8, 3, 8, 3, 8, 3, 8, 7, 8, 72, 10, 8, 12, 8, 14, 8, 75, 
-	11, 8, 3, 8, 3, 8, 3, 8, 7, 8, 80, 10, 8, 12, 8, 14, 8, 83, 11, 8, 3, 8, 
-	3, 8, 7, 8, 87, 10, 8, 12, 8, 14, 8, 90, 11, 8, 3, 8, 3, 8, 3, 8, 5, 8, 
-	95, 10, 8, 3, 9, 3, 9, 3, 9, 3, 10, 3, 10, 3, 11, 3, 11, 3, 11, 3, 11, 
-	5, 11, 106, 10, 11, 3, 12, 3, 12, 3, 13, 3, 13, 7, 13, 112, 10, 13, 12, 
-	13, 14, 13, 115, 11, 13, 3, 13, 3, 13, 7, 13, 119, 10, 13, 12, 13, 14, 
-	13, 122, 11, 13, 3, 13, 3, 13, 7, 13, 126, 10, 13, 12, 13, 14, 13, 129, 
-	11, 13, 3, 13, 3, 13, 7, 13, 133, 10, 13, 12, 13, 14, 13, 136, 11, 13, 
-	3, 13, 3, 13, 7, 13, 140, 10, 13, 12, 13, 14, 13, 143, 11, 13, 5, 13, 145, 
-	10, 13, 3, 14, 3, 14, 3, 15, 3, 15, 3, 16, 3, 16, 3, 16, 3, 17, 3, 17, 
-	3, 18, 3, 18, 3, 18, 3, 18, 3, 18, 2, 2, 19, 2, 4, 6, 8, 10, 12, 14, 16, 
-	18, 20, 22, 24, 26, 28, 30, 32, 34, 2, 3, 3, 2, 10, 11, 2, 160, 2, 36, 
-	3, 2, 2, 2, 4, 39, 3, 2, 2, 2, 6, 44, 3, 2, 2, 2, 8, 55, 3, 2, 2, 2, 10, 
-	57, 3, 2, 2, 2, 12, 59, 3, 2, 2, 2, 14, 94, 3, 2, 2, 2, 16, 96, 3, 2, 2, 
-	2, 18, 99, 3, 2, 2, 2, 20, 105, 3, 2, 2, 2, 22, 107, 3, 2, 2, 2, 24, 144, 
-	3, 2, 2, 2, 26, 146, 3, 2, 2, 2, 28, 148, 3, 2, 2, 2, 30, 150, 3, 2, 2, 
-	2, 32, 153, 3, 2, 2, 2, 34, 155, 3, 2, 2, 2, 36, 37, 5, 16, 9, 2, 37, 38, 
-	7, 2, 2, 3, 38, 3, 3, 2, 2, 2, 39, 40, 9, 2, 2, 2, 40, 5, 3, 2, 2, 2, 41, 
-	43, 7, 11, 2, 2, 42, 41, 3, 2, 2, 2, 43, 46, 3, 2, 2, 2, 44, 42, 3, 2, 
-	2, 2, 44, 45, 3, 2, 2, 2, 45, 47, 3, 2, 2, 2, 46, 44, 3, 2, 2, 2, 47, 48, 
-	5, 18, 10, 2, 48, 52, 5, 4, 3, 2, 49, 51, 7, 11, 2, 2, 50, 49, 3, 2, 2, 
-	2, 51, 54, 3, 2, 2, 2, 52, 50, 3, 2, 2, 2, 52, 53, 3, 2, 2, 2, 53, 7, 3, 
-	2, 2, 2, 54, 52, 3, 2, 2, 2, 55, 56, 7, 3, 2, 2, 56, 9, 3, 2, 2, 2, 57, 
-	58, 7, 4, 2, 2, 58, 11, 3, 2, 2, 2, 59, 60, 5, 8, 5, 2, 60, 61, 5, 14, 
-	8, 2, 61, 13, 3, 2, 2, 2, 62, 64, 7, 11, 2, 2, 63, 62, 3, 2, 2, 2, 64, 
-	67, 3, 2, 2, 2, 65, 63, 3, 2, 2, 2, 65, 66, 3, 2, 2, 2, 66, 68, 3, 2, 2, 
-	2, 67, 65, 3, 2, 2, 2, 68, 69, 5, 18, 10, 2, 69, 73, 5, 4, 3, 2, 70, 72, 
-	7, 11, 2, 2, 71, 70, 3, 2, 2, 2, 72, 75, 3, 2, 2, 2, 73, 71, 3, 2, 2, 2, 
-	73, 74, 3, 2, 2, 2, 74, 76, 3, 2, 2, 2, 75, 73, 3, 2, 2, 2, 76, 77, 5, 
-	14, 8, 2, 77, 95, 3, 2, 2, 2, 78, 80, 7, 11, 2, 2, 79, 78, 3, 2, 2, 2, 
-	80, 83, 3, 2, 2, 2, 81, 79, 3, 2, 2, 2, 81, 82, 3, 2, 2, 2, 82, 84, 3, 
-	2, 2, 2, 83, 81, 3, 2, 2, 2, 84, 88, 5, 18, 10, 2, 85, 87, 7, 11, 2, 2, 
-	86, 85, 3, 2, 2, 2, 87, 90, 3, 2, 2, 2, 88, 86, 3, 2, 2, 2, 88, 89, 3, 
-	2, 2, 2, 89, 91, 3, 2, 2, 2, 90, 88, 3, 2, 2, 2, 91, 92, 5, 10, 6, 2, 92, 
-	95, 3, 2, 2, 2, 93, 95, 5, 10, 6, 2, 94, 65, 3, 2, 2, 2, 94, 81, 3, 2, 
-	2, 2, 94, 93, 3, 2, 2, 2, 95, 15, 3, 2, 2, 2, 96, 97, 5, 12, 7, 2, 97, 
-	98, 7, 2, 2, 3, 98, 17, 3, 2, 2, 2, 99, 100, 5, 20, 11, 2, 100, 19, 3, 
-	2, 2, 2, 101, 106, 5, 22, 12, 2, 102, 103, 5, 22, 12, 2, 103, 104, 5, 24, 
-	13, 2, 104, 106, 3, 2, 2, 2, 105, 101, 3, 2, 2, 2, 105, 102, 3, 2, 2, 2, 
-	106, 21, 3, 2, 2, 2, 107, 108, 7, 8, 2, 2, 108, 23, 3, 2, 2, 2, 109, 113, 
-	5, 26, 14, 2, 110, 112, 5, 24, 13, 2, 111, 110, 3, 2, 2, 2, 112, 115, 3, 
-	2, 2, 2, 113, 111, 3, 2, 2, 2, 113, 114, 3, 2, 2, 2, 114, 145, 3, 2, 2, 
-	2, 115, 113, 3, 2, 2, 2, 116, 120, 5, 28, 15, 2, 117, 119, 5, 24, 13, 2, 
-	118, 117, 3, 2, 2, 2, 119, 122, 3, 2, 2, 2, 120, 118, 3, 2, 2, 2, 120, 
-	121, 3, 2, 2, 2, 121, 145, 3, 2, 2, 2, 122, 120, 3, 2, 2, 2, 123, 127, 
-	5, 30, 16, 2, 124, 126, 5, 24, 13, 2, 125, 124, 3, 2, 2, 2, 126, 129, 3, 
-	2, 2, 2, 127, 125, 3, 2, 2, 2, 127, 128, 3, 2, 2, 2, 128, 145, 3, 2, 2, 
-	2, 129, 127, 3, 2, 2, 2, 130, 134, 5, 32, 17, 2, 131, 133, 5, 24, 13, 2, 
-	132, 131, 3, 2, 2, 2, 133, 136, 3, 2, 2, 2, 134, 132, 3, 2, 2, 2, 134, 
-	135, 3, 2, 2, 2, 135, 145, 3, 2, 2, 2, 136, 134, 3, 2, 2, 2, 137, 141, 
-	5, 34, 18, 2, 138, 140, 5, 24, 13, 2, 139, 138, 3, 2, 2, 2, 140, 143, 3, 
-	2, 2, 2, 141, 139, 3, 2, 2, 2, 141, 142, 3, 2, 2, 2, 142, 145, 3, 2, 2, 
-	2, 143, 141, 3, 2, 2, 2, 144, 109, 3, 2, 2, 2, 144, 116, 3, 2, 2, 2, 144, 
-	123, 3, 2, 2, 2, 144, 130, 3, 2, 2, 2, 144, 137, 3, 2, 2, 2, 145, 25, 3, 
-	2, 2, 2, 146, 147, 7, 8, 2, 2, 147, 27, 3, 2, 2, 2, 148, 149, 7, 9, 2, 
-	2, 149, 29, 3, 2, 2, 2, 150, 151, 7, 5, 2, 2, 151, 152, 7, 8, 2, 2, 152, 
-	31, 3, 2, 2, 2, 153, 154, 5, 12, 7, 2, 154, 33, 3, 2, 2, 2, 155, 156, 7, 
-	6, 2, 2, 156, 157, 5, 24, 13, 2, 157, 158, 7, 7, 2, 2, 158, 35, 3, 2, 2, 
+	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 12, 160,
+	4, 2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7,
+	4, 8, 9, 8, 4, 9, 9, 9, 4, 10, 9, 10, 4, 11, 9, 11, 4, 12, 9, 12, 4, 13,
+	9, 13, 4, 14, 9, 14, 4, 15, 9, 15, 4, 16, 9, 16, 4, 17, 9, 17, 4, 18, 9,
+	18, 3, 2, 3, 2, 3, 2, 3, 3, 3, 3, 3, 4, 7, 4, 43, 10, 4, 12, 4, 14, 4,
+	46, 11, 4, 3, 4, 3, 4, 3, 4, 7, 4, 51, 10, 4, 12, 4, 14, 4, 54, 11, 4,
+	3, 5, 3, 5, 3, 6, 3, 6, 3, 7, 3, 7, 3, 7, 3, 8, 7, 8, 64, 10, 8, 12, 8,
+	14, 8, 67, 11, 8, 3, 8, 3, 8, 3, 8, 7, 8, 72, 10, 8, 12, 8, 14, 8, 75,
+	11, 8, 3, 8, 3, 8, 3, 8, 7, 8, 80, 10, 8, 12, 8, 14, 8, 83, 11, 8, 3, 8,
+	3, 8, 7, 8, 87, 10, 8, 12, 8, 14, 8, 90, 11, 8, 3, 8, 3, 8, 3, 8, 5, 8,
+	95, 10, 8, 3, 9, 3, 9, 3, 9, 3, 10, 3, 10, 3, 11, 3, 11, 3, 11, 3, 11,
+	5, 11, 106, 10, 11, 3, 12, 3, 12, 3, 13, 3, 13, 7, 13, 112, 10, 13, 12,
+	13, 14, 13, 115, 11, 13, 3, 13, 3, 13, 7, 13, 119, 10, 13, 12, 13, 14,
+	13, 122, 11, 13, 3, 13, 3, 13, 7, 13, 126, 10, 13, 12, 13, 14, 13, 129,
+	11, 13, 3, 13, 3, 13, 7, 13, 133, 10, 13, 12, 13, 14, 13, 136, 11, 13,
+	3, 13, 3, 13, 7, 13, 140, 10, 13, 12, 13, 14, 13, 143, 11, 13, 5, 13, 145,
+	10, 13, 3, 14, 3, 14, 3, 15, 3, 15, 3, 16, 3, 16, 3, 16, 3, 17, 3, 17,
+	3, 18, 3, 18, 3, 18, 3, 18, 3, 18, 2, 2, 19, 2, 4, 6, 8, 10, 12, 14, 16,
+	18, 20, 22, 24, 26, 28, 30, 32, 34, 2, 3, 3, 2, 10, 11, 2, 160, 2, 36,
+	3, 2, 2, 2, 4, 39, 3, 2, 2, 2, 6, 44, 3, 2, 2, 2, 8, 55, 3, 2, 2, 2, 10,
+	57, 3, 2, 2, 2, 12, 59, 3, 2, 2, 2, 14, 94, 3, 2, 2, 2, 16, 96, 3, 2, 2,
+	2, 18, 99, 3, 2, 2, 2, 20, 105, 3, 2, 2, 2, 22, 107, 3, 2, 2, 2, 24, 144,
+	3, 2, 2, 2, 26, 146, 3, 2, 2, 2, 28, 148, 3, 2, 2, 2, 30, 150, 3, 2, 2,
+	2, 32, 153, 3, 2, 2, 2, 34, 155, 3, 2, 2, 2, 36, 37, 5, 16, 9, 2, 37, 38,
+	7, 2, 2, 3, 38, 3, 3, 2, 2, 2, 39, 40, 9, 2, 2, 2, 40, 5, 3, 2, 2, 2, 41,
+	43, 7, 11, 2, 2, 42, 41, 3, 2, 2, 2, 43, 46, 3, 2, 2, 2, 44, 42, 3, 2,
+	2, 2, 44, 45, 3, 2, 2, 2, 45, 47, 3, 2, 2, 2, 46, 44, 3, 2, 2, 2, 47, 48,
+	5, 18, 10, 2, 48, 52, 5, 4, 3, 2, 49, 51, 7, 11, 2, 2, 50, 49, 3, 2, 2,
+	2, 51, 54, 3, 2, 2, 2, 52, 50, 3, 2, 2, 2, 52, 53, 3, 2, 2, 2, 53, 7, 3,
+	2, 2, 2, 54, 52, 3, 2, 2, 2, 55, 56, 7, 3, 2, 2, 56, 9, 3, 2, 2, 2, 57,
+	58, 7, 4, 2, 2, 58, 11, 3, 2, 2, 2, 59, 60, 5, 8, 5, 2, 60, 61, 5, 14,
+	8, 2, 61, 13, 3, 2, 2, 2, 62, 64, 7, 11, 2, 2, 63, 62, 3, 2, 2, 2, 64,
+	67, 3, 2, 2, 2, 65, 63, 3, 2, 2, 2, 65, 66, 3, 2, 2, 2, 66, 68, 3, 2, 2,
+	2, 67, 65, 3, 2, 2, 2, 68, 69, 5, 18, 10, 2, 69, 73, 5, 4, 3, 2, 70, 72,
+	7, 11, 2, 2, 71, 70, 3, 2, 2, 2, 72, 75, 3, 2, 2, 2, 73, 71, 3, 2, 2, 2,
+	73, 74, 3, 2, 2, 2, 74, 76, 3, 2, 2, 2, 75, 73, 3, 2, 2, 2, 76, 77, 5,
+	14, 8, 2, 77, 95, 3, 2, 2, 2, 78, 80, 7, 11, 2, 2, 79, 78, 3, 2, 2, 2,
+	80, 83, 3, 2, 2, 2, 81, 79, 3, 2, 2, 2, 81, 82, 3, 2, 2, 2, 82, 84, 3,
+	2, 2, 2, 83, 81, 3, 2, 2, 2, 84, 88, 5, 18, 10, 2, 85, 87, 7, 11, 2, 2,
+	86, 85, 3, 2, 2, 2, 87, 90, 3, 2, 2, 2, 88, 86, 3, 2, 2, 2, 88, 89, 3,
+	2, 2, 2, 89, 91, 3, 2, 2, 2, 90, 88, 3, 2, 2, 2, 91, 92, 5, 10, 6, 2, 92,
+	95, 3, 2, 2, 2, 93, 95, 5, 10, 6, 2, 94, 65, 3, 2, 2, 2, 94, 81, 3, 2,
+	2, 2, 94, 93, 3, 2, 2, 2, 95, 15, 3, 2, 2, 2, 96, 97, 5, 12, 7, 2, 97,
+	98, 7, 2, 2, 3, 98, 17, 3, 2, 2, 2, 99, 100, 5, 20, 11, 2, 100, 19, 3,
+	2, 2, 2, 101, 106, 5, 22, 12, 2, 102, 103, 5, 22, 12, 2, 103, 104, 5, 24,
+	13, 2, 104, 106, 3, 2, 2, 2, 105, 101, 3, 2, 2, 2, 105, 102, 3, 2, 2, 2,
+	106, 21, 3, 2, 2, 2, 107, 108, 7, 8, 2, 2, 108, 23, 3, 2, 2, 2, 109, 113,
+	5, 26, 14, 2, 110, 112, 5, 24, 13, 2, 111, 110, 3, 2, 2, 2, 112, 115, 3,
+	2, 2, 2, 113, 111, 3, 2, 2, 2, 113, 114, 3, 2, 2, 2, 114, 145, 3, 2, 2,
+	2, 115, 113, 3, 2, 2, 2, 116, 120, 5, 28, 15, 2, 117, 119, 5, 24, 13, 2,
+	118, 117, 3, 2, 2, 2, 119, 122, 3, 2, 2, 2, 120, 118, 3, 2, 2, 2, 120,
+	121, 3, 2, 2, 2, 121, 145, 3, 2, 2, 2, 122, 120, 3, 2, 2, 2, 123, 127,
+	5, 30, 16, 2, 124, 126, 5, 24, 13, 2, 125, 124, 3, 2, 2, 2, 126, 129, 3,
+	2, 2, 2, 127, 125, 3, 2, 2, 2, 127, 128, 3, 2, 2, 2, 128, 145, 3, 2, 2,
+	2, 129, 127, 3, 2, 2, 2, 130, 134, 5, 32, 17, 2, 131, 133, 5, 24, 13, 2,
+	132, 131, 3, 2, 2, 2, 133, 136, 3, 2, 2, 2, 134, 132, 3, 2, 2, 2, 134,
+	135, 3, 2, 2, 2, 135, 145, 3, 2, 2, 2, 136, 134, 3, 2, 2, 2, 137, 141,
+	5, 34, 18, 2, 138, 140, 5, 24, 13, 2, 139, 138, 3, 2, 2, 2, 140, 143, 3,
+	2, 2, 2, 141, 139, 3, 2, 2, 2, 141, 142, 3, 2, 2, 2, 142, 145, 3, 2, 2,
+	2, 143, 141, 3, 2, 2, 2, 144, 109, 3, 2, 2, 2, 144, 116, 3, 2, 2, 2, 144,
+	123, 3, 2, 2, 2, 144, 130, 3, 2, 2, 2, 144, 137, 3, 2, 2, 2, 145, 25, 3,
+	2, 2, 2, 146, 147, 7, 8, 2, 2, 147, 27, 3, 2, 2, 2, 148, 149, 7, 9, 2,
+	2, 149, 29, 3, 2, 2, 2, 150, 151, 7, 5, 2, 2, 151, 152, 7, 8, 2, 2, 152,
+	31, 3, 2, 2, 2, 153, 154, 5, 12, 7, 2, 154, 33, 3, 2, 2, 2, 155, 156, 7,
+	6, 2, 2, 156, 157, 5, 24, 13, 2, 157, 158, 7, 7, 2, 2, 158, 35, 3, 2, 2,
 	2, 16, 44, 52, 65, 73, 81, 88, 94, 105, 113, 120, 127, 134, 141, 144,
 }
 var deserializer = antlr.NewATNDeserializer(nil)
@@ -95,9 +94,9 @@ var symbolicNames = []string{
 }
 
 var ruleNames = []string{
-	"start", "terminator", "commandListItem", "openBlock", "closeBlock", "commandBlock", 
-	"commandBlockTail", "script", "singleCommand", "commandLine", "commandName", 
-	"arguments", "namedArgument", "numericArgument", "variableArgument", "scriptArgument", 
+	"start", "terminator", "commandListItem", "openBlock", "closeBlock", "commandBlock",
+	"commandBlockTail", "script", "singleCommand", "commandLine", "commandName",
+	"arguments", "namedArgument", "numericArgument", "variableArgument", "scriptArgument",
 	"listArgument",
 }
 var decisionToDFA = make([]*antlr.DFA, len(deserializedATN.DecisionToState))
@@ -128,38 +127,38 @@ func NewGShellParser(input antlr.TokenStream) *GShellParser {
 
 // GShellParser tokens.
 const (
-	GShellParserEOF = antlr.TokenEOF
-	GShellParserT__0 = 1
-	GShellParserT__1 = 2
-	GShellParserT__2 = 3
-	GShellParserT__3 = 4
-	GShellParserT__4 = 5
+	GShellParserEOF        = antlr.TokenEOF
+	GShellParserT__0       = 1
+	GShellParserT__1       = 2
+	GShellParserT__2       = 3
+	GShellParserT__3       = 4
+	GShellParserT__4       = 5
 	GShellParserIDENTIFIER = 6
-	GShellParserNUMBER = 7
+	GShellParserNUMBER     = 7
 	GShellParserTERMINATOR = 8
-	GShellParserNL = 9
-	GShellParserWS = 10
+	GShellParserNL         = 9
+	GShellParserWS         = 10
 )
 
 // GShellParser rules.
 const (
-	GShellParserRULE_start = 0
-	GShellParserRULE_terminator = 1
-	GShellParserRULE_commandListItem = 2
-	GShellParserRULE_openBlock = 3
-	GShellParserRULE_closeBlock = 4
-	GShellParserRULE_commandBlock = 5
+	GShellParserRULE_start            = 0
+	GShellParserRULE_terminator       = 1
+	GShellParserRULE_commandListItem  = 2
+	GShellParserRULE_openBlock        = 3
+	GShellParserRULE_closeBlock       = 4
+	GShellParserRULE_commandBlock     = 5
 	GShellParserRULE_commandBlockTail = 6
-	GShellParserRULE_script = 7
-	GShellParserRULE_singleCommand = 8
-	GShellParserRULE_commandLine = 9
-	GShellParserRULE_commandName = 10
-	GShellParserRULE_arguments = 11
-	GShellParserRULE_namedArgument = 12
-	GShellParserRULE_numericArgument = 13
+	GShellParserRULE_script           = 7
+	GShellParserRULE_singleCommand    = 8
+	GShellParserRULE_commandLine      = 9
+	GShellParserRULE_commandName      = 10
+	GShellParserRULE_arguments        = 11
+	GShellParserRULE_namedArgument    = 12
+	GShellParserRULE_numericArgument  = 13
 	GShellParserRULE_variableArgument = 14
-	GShellParserRULE_scriptArgument = 15
-	GShellParserRULE_listArgument = 16
+	GShellParserRULE_scriptArgument   = 15
+	GShellParserRULE_listArgument     = 16
 )
 
 // IStartContext is an interface to support dynamic dispatch.
@@ -222,7 +221,6 @@ func (s *StartContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) 
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *StartContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterStart(s)
@@ -234,9 +232,6 @@ func (s *StartContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitStart(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) Start() (localctx IStartContext) {
 	localctx = NewStartContext(p, p.GetParserRuleContext(), p.GetState())
@@ -268,11 +263,8 @@ func (p *GShellParser) Start() (localctx IStartContext) {
 		p.Match(GShellParserEOF)
 	}
 
-
-
 	return localctx
 }
-
 
 // ITerminatorContext is an interface to support dynamic dispatch.
 type ITerminatorContext interface {
@@ -328,7 +320,6 @@ func (s *TerminatorContext) ToStringTree(ruleNames []string, recog antlr.Recogni
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *TerminatorContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterTerminator(s)
@@ -341,14 +332,10 @@ func (s *TerminatorContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
-
-
-
 func (p *GShellParser) Terminator() (localctx ITerminatorContext) {
 	localctx = NewTerminatorContext(p, p.GetParserRuleContext(), p.GetState())
 	p.EnterRule(localctx, 2, GShellParserRULE_terminator)
 	var _la int
-
 
 	defer func() {
 		p.ExitRule()
@@ -379,11 +366,8 @@ func (p *GShellParser) Terminator() (localctx ITerminatorContext) {
 		}
 	}
 
-
-
 	return localctx
 }
-
 
 // ICommandListItemContext is an interface to support dynamic dispatch.
 type ICommandListItemContext interface {
@@ -459,7 +443,6 @@ func (s *CommandListItemContext) ToStringTree(ruleNames []string, recog antlr.Re
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *CommandListItemContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterCommandListItem(s)
@@ -472,14 +455,10 @@ func (s *CommandListItemContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
-
-
-
 func (p *GShellParser) CommandListItem() (localctx ICommandListItemContext) {
 	localctx = NewCommandListItemContext(p, p.GetParserRuleContext(), p.GetState())
 	p.EnterRule(localctx, 4, GShellParserRULE_commandListItem)
 	var _la int
-
 
 	defer func() {
 		p.ExitRule()
@@ -502,13 +481,11 @@ func (p *GShellParser) CommandListItem() (localctx ICommandListItemContext) {
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-
 	for _la == GShellParserNL {
 		{
 			p.SetState(39)
 			p.Match(GShellParserNL)
 		}
-
 
 		p.SetState(44)
 		p.GetErrorHandler().Sync(p)
@@ -526,24 +503,19 @@ func (p *GShellParser) CommandListItem() (localctx ICommandListItemContext) {
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-
 	for _la == GShellParserNL {
 		{
 			p.SetState(47)
 			p.Match(GShellParserNL)
 		}
 
-
 		p.SetState(52)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
 
-
-
 	return localctx
 }
-
 
 // IOpenBlockContext is an interface to support dynamic dispatch.
 type IOpenBlockContext interface {
@@ -590,7 +562,6 @@ func (s *OpenBlockContext) ToStringTree(ruleNames []string, recog antlr.Recogniz
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *OpenBlockContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterOpenBlock(s)
@@ -602,9 +573,6 @@ func (s *OpenBlockContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitOpenBlock(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) OpenBlock() (localctx IOpenBlockContext) {
 	localctx = NewOpenBlockContext(p, p.GetParserRuleContext(), p.GetState())
@@ -632,11 +600,8 @@ func (p *GShellParser) OpenBlock() (localctx IOpenBlockContext) {
 		p.Match(GShellParserT__0)
 	}
 
-
-
 	return localctx
 }
-
 
 // ICloseBlockContext is an interface to support dynamic dispatch.
 type ICloseBlockContext interface {
@@ -683,7 +648,6 @@ func (s *CloseBlockContext) ToStringTree(ruleNames []string, recog antlr.Recogni
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *CloseBlockContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterCloseBlock(s)
@@ -695,9 +659,6 @@ func (s *CloseBlockContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitCloseBlock(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) CloseBlock() (localctx ICloseBlockContext) {
 	localctx = NewCloseBlockContext(p, p.GetParserRuleContext(), p.GetState())
@@ -725,11 +686,8 @@ func (p *GShellParser) CloseBlock() (localctx ICloseBlockContext) {
 		p.Match(GShellParserT__1)
 	}
 
-
-
 	return localctx
 }
-
 
 // ICommandBlockContext is an interface to support dynamic dispatch.
 type ICommandBlockContext interface {
@@ -797,7 +755,6 @@ func (s *CommandBlockContext) ToStringTree(ruleNames []string, recog antlr.Recog
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *CommandBlockContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterCommandBlock(s)
@@ -809,9 +766,6 @@ func (s *CommandBlockContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitCommandBlock(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) CommandBlock() (localctx ICommandBlockContext) {
 	localctx = NewCommandBlockContext(p, p.GetParserRuleContext(), p.GetState())
@@ -843,11 +797,8 @@ func (p *GShellParser) CommandBlock() (localctx ICommandBlockContext) {
 		p.CommandBlockTail()
 	}
 
-
-
 	return localctx
 }
-
 
 // ICommandBlockTailContext is an interface to support dynamic dispatch.
 type ICommandBlockTailContext interface {
@@ -943,7 +894,6 @@ func (s *CommandBlockTailContext) ToStringTree(ruleNames []string, recog antlr.R
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *CommandBlockTailContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterCommandBlockTail(s)
@@ -956,14 +906,10 @@ func (s *CommandBlockTailContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
-
-
-
 func (p *GShellParser) CommandBlockTail() (localctx ICommandBlockTailContext) {
 	localctx = NewCommandBlockTailContext(p, p.GetParserRuleContext(), p.GetState())
 	p.EnterRule(localctx, 12, GShellParserRULE_commandBlockTail)
 	var _la int
-
 
 	defer func() {
 		p.ExitRule()
@@ -992,13 +938,11 @@ func (p *GShellParser) CommandBlockTail() (localctx ICommandBlockTailContext) {
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
-
 		for _la == GShellParserNL {
 			{
 				p.SetState(60)
 				p.Match(GShellParserNL)
 			}
-
 
 			p.SetState(65)
 			p.GetErrorHandler().Sync(p)
@@ -1023,7 +967,6 @@ func (p *GShellParser) CommandBlockTail() (localctx ICommandBlockTailContext) {
 					p.Match(GShellParserNL)
 				}
 
-
 			}
 			p.SetState(73)
 			p.GetErrorHandler().Sync(p)
@@ -1034,20 +977,17 @@ func (p *GShellParser) CommandBlockTail() (localctx ICommandBlockTailContext) {
 			p.CommandBlockTail()
 		}
 
-
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		p.SetState(79)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
-
 		for _la == GShellParserNL {
 			{
 				p.SetState(76)
 				p.Match(GShellParserNL)
 			}
-
 
 			p.SetState(81)
 			p.GetErrorHandler().Sync(p)
@@ -1061,13 +1001,11 @@ func (p *GShellParser) CommandBlockTail() (localctx ICommandBlockTailContext) {
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
-
 		for _la == GShellParserNL {
 			{
 				p.SetState(83)
 				p.Match(GShellParserNL)
 			}
-
 
 			p.SetState(88)
 			p.GetErrorHandler().Sync(p)
@@ -1078,7 +1016,6 @@ func (p *GShellParser) CommandBlockTail() (localctx ICommandBlockTailContext) {
 			p.CloseBlock()
 		}
 
-
 	case 3:
 		p.EnterOuterAlt(localctx, 3)
 		{
@@ -1088,10 +1025,8 @@ func (p *GShellParser) CommandBlockTail() (localctx ICommandBlockTailContext) {
 
 	}
 
-
 	return localctx
 }
-
 
 // IScriptContext is an interface to support dynamic dispatch.
 type IScriptContext interface {
@@ -1153,7 +1088,6 @@ func (s *ScriptContext) ToStringTree(ruleNames []string, recog antlr.Recognizer)
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *ScriptContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterScript(s)
@@ -1165,9 +1099,6 @@ func (s *ScriptContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitScript(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) Script() (localctx IScriptContext) {
 	localctx = NewScriptContext(p, p.GetParserRuleContext(), p.GetState())
@@ -1199,11 +1130,8 @@ func (p *GShellParser) Script() (localctx IScriptContext) {
 		p.Match(GShellParserEOF)
 	}
 
-
-
 	return localctx
 }
-
 
 // ISingleCommandContext is an interface to support dynamic dispatch.
 type ISingleCommandContext interface {
@@ -1261,7 +1189,6 @@ func (s *SingleCommandContext) ToStringTree(ruleNames []string, recog antlr.Reco
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *SingleCommandContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterSingleCommand(s)
@@ -1273,9 +1200,6 @@ func (s *SingleCommandContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitSingleCommand(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) SingleCommand() (localctx ISingleCommandContext) {
 	localctx = NewSingleCommandContext(p, p.GetParserRuleContext(), p.GetState())
@@ -1303,11 +1227,8 @@ func (p *GShellParser) SingleCommand() (localctx ISingleCommandContext) {
 		p.CommandLine()
 	}
 
-
-
 	return localctx
 }
-
 
 // ICommandLineContext is an interface to support dynamic dispatch.
 type ICommandLineContext interface {
@@ -1375,7 +1296,6 @@ func (s *CommandLineContext) ToStringTree(ruleNames []string, recog antlr.Recogn
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *CommandLineContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterCommandLine(s)
@@ -1387,9 +1307,6 @@ func (s *CommandLineContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitCommandLine(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) CommandLine() (localctx ICommandLineContext) {
 	localctx = NewCommandLineContext(p, p.GetParserRuleContext(), p.GetState())
@@ -1421,7 +1338,6 @@ func (p *GShellParser) CommandLine() (localctx ICommandLineContext) {
 			p.CommandName()
 		}
 
-
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		{
@@ -1435,10 +1351,8 @@ func (p *GShellParser) CommandLine() (localctx ICommandLineContext) {
 
 	}
 
-
 	return localctx
 }
-
 
 // ICommandNameContext is an interface to support dynamic dispatch.
 type ICommandNameContext interface {
@@ -1490,7 +1404,6 @@ func (s *CommandNameContext) ToStringTree(ruleNames []string, recog antlr.Recogn
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *CommandNameContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterCommandName(s)
@@ -1502,9 +1415,6 @@ func (s *CommandNameContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitCommandName(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) CommandName() (localctx ICommandNameContext) {
 	localctx = NewCommandNameContext(p, p.GetParserRuleContext(), p.GetState())
@@ -1532,11 +1442,8 @@ func (p *GShellParser) CommandName() (localctx ICommandNameContext) {
 		p.Match(GShellParserIDENTIFIER)
 	}
 
-
-
 	return localctx
 }
-
 
 // IArgumentsContext is an interface to support dynamic dispatch.
 type IArgumentsContext interface {
@@ -1657,7 +1564,6 @@ func (s *ArgumentsContext) ToStringTree(ruleNames []string, recog antlr.Recogniz
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *ArgumentsContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterArguments(s)
@@ -1669,9 +1575,6 @@ func (s *ArgumentsContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitArguments(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) Arguments() (localctx IArgumentsContext) {
 	localctx = NewArgumentsContext(p, p.GetParserRuleContext(), p.GetState())
@@ -1716,13 +1619,11 @@ func (p *GShellParser) Arguments() (localctx IArgumentsContext) {
 					p.Arguments()
 				}
 
-
 			}
 			p.SetState(113)
 			p.GetErrorHandler().Sync(p)
 			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 8, p.GetParserRuleContext())
 		}
-
 
 	case GShellParserNUMBER:
 		p.EnterOuterAlt(localctx, 2)
@@ -1741,13 +1642,11 @@ func (p *GShellParser) Arguments() (localctx IArgumentsContext) {
 					p.Arguments()
 				}
 
-
 			}
 			p.SetState(120)
 			p.GetErrorHandler().Sync(p)
 			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 9, p.GetParserRuleContext())
 		}
-
 
 	case GShellParserT__2:
 		p.EnterOuterAlt(localctx, 3)
@@ -1766,13 +1665,11 @@ func (p *GShellParser) Arguments() (localctx IArgumentsContext) {
 					p.Arguments()
 				}
 
-
 			}
 			p.SetState(127)
 			p.GetErrorHandler().Sync(p)
 			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 10, p.GetParserRuleContext())
 		}
-
 
 	case GShellParserT__0:
 		p.EnterOuterAlt(localctx, 4)
@@ -1791,13 +1688,11 @@ func (p *GShellParser) Arguments() (localctx IArgumentsContext) {
 					p.Arguments()
 				}
 
-
 			}
 			p.SetState(134)
 			p.GetErrorHandler().Sync(p)
 			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 11, p.GetParserRuleContext())
 		}
-
 
 	case GShellParserT__3:
 		p.EnterOuterAlt(localctx, 5)
@@ -1816,23 +1711,18 @@ func (p *GShellParser) Arguments() (localctx IArgumentsContext) {
 					p.Arguments()
 				}
 
-
 			}
 			p.SetState(141)
 			p.GetErrorHandler().Sync(p)
 			_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 12, p.GetParserRuleContext())
 		}
 
-
-
 	default:
 		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
 	}
 
-
 	return localctx
 }
-
 
 // INamedArgumentContext is an interface to support dynamic dispatch.
 type INamedArgumentContext interface {
@@ -1884,7 +1774,6 @@ func (s *NamedArgumentContext) ToStringTree(ruleNames []string, recog antlr.Reco
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *NamedArgumentContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterNamedArgument(s)
@@ -1896,9 +1785,6 @@ func (s *NamedArgumentContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitNamedArgument(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) NamedArgument() (localctx INamedArgumentContext) {
 	localctx = NewNamedArgumentContext(p, p.GetParserRuleContext(), p.GetState())
@@ -1926,11 +1812,8 @@ func (p *GShellParser) NamedArgument() (localctx INamedArgumentContext) {
 		p.Match(GShellParserIDENTIFIER)
 	}
 
-
-
 	return localctx
 }
-
 
 // INumericArgumentContext is an interface to support dynamic dispatch.
 type INumericArgumentContext interface {
@@ -1982,7 +1865,6 @@ func (s *NumericArgumentContext) ToStringTree(ruleNames []string, recog antlr.Re
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *NumericArgumentContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterNumericArgument(s)
@@ -1994,9 +1876,6 @@ func (s *NumericArgumentContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitNumericArgument(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) NumericArgument() (localctx INumericArgumentContext) {
 	localctx = NewNumericArgumentContext(p, p.GetParserRuleContext(), p.GetState())
@@ -2024,11 +1903,8 @@ func (p *GShellParser) NumericArgument() (localctx INumericArgumentContext) {
 		p.Match(GShellParserNUMBER)
 	}
 
-
-
 	return localctx
 }
-
 
 // IVariableArgumentContext is an interface to support dynamic dispatch.
 type IVariableArgumentContext interface {
@@ -2080,7 +1956,6 @@ func (s *VariableArgumentContext) ToStringTree(ruleNames []string, recog antlr.R
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *VariableArgumentContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterVariableArgument(s)
@@ -2092,9 +1967,6 @@ func (s *VariableArgumentContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitVariableArgument(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) VariableArgument() (localctx IVariableArgumentContext) {
 	localctx = NewVariableArgumentContext(p, p.GetParserRuleContext(), p.GetState())
@@ -2126,11 +1998,8 @@ func (p *GShellParser) VariableArgument() (localctx IVariableArgumentContext) {
 		p.Match(GShellParserIDENTIFIER)
 	}
 
-
-
 	return localctx
 }
-
 
 // IScriptArgumentContext is an interface to support dynamic dispatch.
 type IScriptArgumentContext interface {
@@ -2188,7 +2057,6 @@ func (s *ScriptArgumentContext) ToStringTree(ruleNames []string, recog antlr.Rec
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *ScriptArgumentContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterScriptArgument(s)
@@ -2200,9 +2068,6 @@ func (s *ScriptArgumentContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitScriptArgument(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) ScriptArgument() (localctx IScriptArgumentContext) {
 	localctx = NewScriptArgumentContext(p, p.GetParserRuleContext(), p.GetState())
@@ -2230,11 +2095,8 @@ func (p *GShellParser) ScriptArgument() (localctx IScriptArgumentContext) {
 		p.CommandBlock()
 	}
 
-
-
 	return localctx
 }
-
 
 // IListArgumentContext is an interface to support dynamic dispatch.
 type IListArgumentContext interface {
@@ -2292,7 +2154,6 @@ func (s *ListArgumentContext) ToStringTree(ruleNames []string, recog antlr.Recog
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-
 func (s *ListArgumentContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(GShellListener); ok {
 		listenerT.EnterListArgument(s)
@@ -2304,9 +2165,6 @@ func (s *ListArgumentContext) ExitRule(listener antlr.ParseTreeListener) {
 		listenerT.ExitListArgument(s)
 	}
 }
-
-
-
 
 func (p *GShellParser) ListArgument() (localctx IListArgumentContext) {
 	localctx = NewListArgumentContext(p, p.GetParserRuleContext(), p.GetState())
@@ -2342,9 +2200,5 @@ func (p *GShellParser) ListArgument() (localctx IListArgumentContext) {
 		p.Match(GShellParserT__4)
 	}
 
-
-
 	return localctx
 }
-
-

@@ -1,6 +1,10 @@
 package ast
 
-import "github.com/andrebq/gshell/internal/pdata"
+import (
+	"bytes"
+
+	"github.com/andrebq/gshell/internal/pdata"
+)
 
 func (l *List) anchor() {}
 
@@ -61,6 +65,31 @@ func (l *List) ToSlice(dest []Argument) []Argument {
 		return true
 	})
 	return dest
+}
+
+// ForEach runs fn for every element in the list,
+// users should return false if the want to bail out before
+// processing the whole list.
+//
+// It returns the number of items that were iterated before
+// false was returned
+func (l *List) ForEach(fn func(Argument) bool) int {
+	var count int
+	step := func(a pdata.Any) bool {
+		count++
+		return fn(a.(Argument))
+	}
+	l.data.Range(step)
+	return count
+}
+
+// String takes the list and prints it as a string, which
+// conforms to the standard gshell formatting rules
+func (l *List) String() string {
+	buf := bytes.Buffer{}
+	p := NewPrinter(&buf)
+	l.Fmt(p)
+	return buf.String()
 }
 
 // fmt is just a helper to print all items while
