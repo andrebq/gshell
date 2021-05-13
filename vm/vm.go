@@ -21,7 +21,7 @@ type (
 	}
 
 	Module struct {
-		definitions map[ast.Symbol]Value
+		definitions *Context
 	}
 
 	Value interface{}
@@ -88,19 +88,32 @@ func mustSym(s string) ast.Symbol {
 	return sym
 }
 
-func EmptyModule() *Module {
+func EmptyModule(ctx *Context) *Module {
 	return &Module{
-		definitions: make(map[ast.Symbol]Value),
+		definitions: NewContext(ctx),
 	}
 }
 
+func NewRootContext() *Context {
+	rootCtx := NewContext(nil)
+
+	const defaultChanSize = 1000
+	rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))
+	rootCtx.Set(StdinChannel, make(chan Event, defaultChanSize))
+	rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))
+
+	return rootCtx
+}
+
 func NewVM() *VM {
+	rootCtx := NewRootContext()
+
 	vm := &VM{
 		builtins: make(map[ast.Symbol]Process),
 		modules: map[ast.Symbol]*Module{
-			mainModuleSym: EmptyModule(),
+			mainModuleSym: EmptyModule(rootCtx),
 		},
-		rootCtx:       NewContext(nil),
+		rootCtx:       rootCtx,
 		currentModule: mainModuleSym,
 	}
 	vm.builtins[printlnSym] = ProcessFunc(GShellPrintln)
@@ -112,10 +125,6 @@ func NewVM() *VM {
 	vm.builtins[loop] = ProcessFunc(GShellLoop)
 	vm.builtins[funcSym] = ProcessFunc(GShellFunc)
 
-	const defaultChanSize = 1000
-	vm.rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))
-	vm.rootCtx.Set(StdinChannel, make(chan Event, defaultChanSize))
-	vm.rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))
 	return vm
 }
 
@@ -193,22 +202,24 @@ func (v *VM) runCommand(ctx *Context, cmd *ast.Cmd) *CallStack {
 		v.callBuiltin(call, bt)
 		return call
 	}
-	moduleFunc, found := v.modules[v.currentModule].definitions[cmd.Command()]
+	value, found := ctx.Get(cmd.Command())
+	if found {
+		v.callValue(call, value)
+		return call
+	}
+
+	moduleFunc, found := v.modules[v.currentModule].definitions.Get(cmd.Command())
 	if found {
 		v.callFunction(call, moduleFunc.(*function))
 		return call
 	}
-	value, found := ctx.Get(cmd.Command())
-	if !found {
-		call.FailWith = fmt.Errorf("Command %v not found", cmd.Command().Text())
-		return call
-	}
-	v.callValue(call, value)
+
+	call.FailWith = fmt.Errorf("Command %v not found", cmd.Command().Text())
 	return call
 }
 
 func (v *VM) callFunction(call *CallStack, funcDeclaration *function) {
-	ctx := NewFunctionContext(call.Context)
+	ctx := NewFunctionContext(funcDeclaration.upvalues)
 	if len(funcDeclaration.args) != len(call.RawArgs) {
 		call.FailWith = fmt.Errorf("Function %v requires %v args got %v", funcDeclaration.name, len(funcDeclaration.args), len(call.RawArgs))
 		return

@@ -156,23 +156,53 @@ func extractAtLeastValues(in <-chan Event, n int) ([]Value, error) {
 func TestFunctionDefinition(t *testing.T) {
 	vm := NewVM()
 	_, err := vm.Run(`{
+		let $moduleVar 10
+		let $otherModuleVar 10
 		func print-a-and-b [$a $b] {
-			println $a $b
+			let $localVar 20
+			let $otherModuleVar 30
+			println $a $b $moduleVar $localVar $otherModuleVar
 		}
 		print-a-and-b 10 [10 20]
+		println $otherModuleVar
 }`)
 	if err != nil {
 		t.Errorf("Unable to call-func with parameters: %v", err)
 	} else {
 		out := vm.Stdout()
-		var ev Event
-		select {
-		case ev = <-out:
-			if !reflect.DeepEqual(ev.Main, fmt.Sprintf("10 [ 10 20 ]\n")) {
-				t.Errorf("Unexpected value %#v in stdout channel", ev.Main)
+		var sink []Value
+	LOOP:
+		for {
+			select {
+			case ev := <-out:
+				sink = append(sink, ev.Main)
+				if len(sink) == 2 {
+					break LOOP
+				}
+			default:
+				t.Error("out channel should have at least two entries")
 			}
-		default:
-			t.Error("out channel should have at least one entry")
 		}
+		if !reflect.DeepEqual(sink[0], fmt.Sprintf("10 [ 10 20 ] 10 20 30\n")) {
+			t.Errorf("Unexpected value %#v in stdout channel", sink[0])
+		}
+		if !reflect.DeepEqual(sink[1], fmt.Sprintf("30\n")) {
+			t.Errorf("Unexpected value %#v in stdout channel", sink[1])
+		}
+	}
+}
+
+func TestFunctionsCannotDeclareOtherFunctions(t *testing.T) {
+	vm := NewVM()
+	_, err := vm.Run(`{
+		func print-a-and-b [$a,$b] {
+			func internal [] {
+				true
+			}
+		}
+		print-a-and-b 10 10
+	}`)
+	if err == nil {
+		t.Fatal("Gshell should not support internal function definitions (yet!)")
 	}
 }

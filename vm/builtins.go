@@ -226,13 +226,13 @@ func GShellFunc(c *CallStack) {
 		return
 	}
 
-	if _, defined := module.definitions[funcName]; defined {
+	if _, defined := module.definitions.Get(funcName); defined {
 		c.FailWith = fmt.Errorf("Module %v already contains a function called %v.", cm, funcName)
 		return
 	}
 
 	fn := c.VM.newFunction(c.Context, cm, funcName, argList, body)
-	module.definitions[funcName] = fn
+	module.definitions.Set(funcName, fn)
 	c.ReturnValue = fn
 	return
 }
