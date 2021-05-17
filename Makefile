@@ -4,7 +4,8 @@ build:
 	go build ./...
 
 test: build
-	go test ./...
+	go clean -testcache
+	go test -timeout 2s  ./...
 
 benchmark: test
 	go test -bench=. -benchtime=15s ./mailbox

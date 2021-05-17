@@ -15,12 +15,10 @@ func TestVM(t *testing.T) {
 		t.Error(err)
 	}
 
-	out := vm.Stdout()
-	var ev Event
 	select {
-	case ev = <-out:
-		if !reflect.DeepEqual(ev.Main, fmt.Sprintf("hello world\n")) {
-			t.Errorf("Unexpected value %#v in stdout channel", ev.Main)
+	case entry := <-vm.Stdout().Take():
+		if !reflect.DeepEqual(entry, fmt.Sprintf("hello world\n")) {
+			t.Errorf("Unexpected value %#v in stdout channel", entry)
 		}
 	default:
 		t.Error("out channel should have at least one entry")
@@ -37,11 +35,10 @@ func TestSetVariable(t *testing.T) {
 	}
 
 	out := vm.Stdout()
-	var ev Event
 	select {
-	case ev = <-out:
-		if !reflect.DeepEqual(ev.Main, fmt.Sprintf("123\n")) {
-			t.Errorf("Unexpected value %#v in stdout channel", ev.Main)
+	case ev := <-out.Take():
+		if !reflect.DeepEqual(ev, fmt.Sprintf("123\n")) {
+			t.Errorf("Unexpected value %#v in stdout channel", ev)
 		}
 	default:
 		t.Error("out channel should have at least one entry")
@@ -63,23 +60,12 @@ func TestConditional(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	out := vm.Stdout()
-	var ev Event
-	select {
-	case ev = <-out:
-		if !reflect.DeepEqual(ev.Main, fmt.Sprintf("true\n")) {
-			t.Errorf("Unexpected value %#v in stdout channel", ev.Main)
-		}
-	default:
-		t.Error("out channel should have at least one entry")
+	items, err := extractAtLeastValues(vm.Stdout().Take(), 2)
+	if err != nil {
+		t.Fatal(err)
 	}
-	select {
-	case ev = <-out:
-		if !reflect.DeepEqual(ev.Main, fmt.Sprintf("false\n")) {
-			t.Errorf("Unexpected value %#v in stdout channel", ev.Main)
-		}
-	default:
-		t.Error("out channel should have two entries")
+	if !reflect.DeepEqual(items, []Value{"true\n", "false\n"}) {
+		t.Errorf("Unexpected values: %#v", items)
 	}
 }
 
@@ -94,24 +80,10 @@ func TestGuard(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	out := vm.Stdout()
-	var ev Event
-	select {
-	case ev = <-out:
-		if !reflect.DeepEqual(ev.Main, fmt.Sprintf("1\n")) {
-			t.Errorf("Unexpected value %#v in stdout channel", ev.Main)
-		}
-	default:
-		t.Error("out channel should have at least one entry")
-	}
-	select {
-	case ev = <-out:
-		if !reflect.DeepEqual(ev.Main, fmt.Sprintf("10\n")) {
-			t.Errorf("Variable defined within a guard should be visible to the outer context. Got %v", ev.Main)
-		}
-	default:
-		t.Error("out channel should have at least one entry")
-	}
+	assertOutput(t, vm.Stdout().Take(), []Value{
+		"1\n",
+		"10\n",
+	})
 }
 
 func TestSequenceLoop(t *testing.T) {
@@ -124,35 +96,14 @@ func TestSequenceLoop(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	actualEvents, err := extractAtLeastValues(vm.Stdout(), 5)
-	if err != nil {
-		t.Fatal(err)
-	}
-	expectedEvents := []Value{
+	assertOutput(t, vm.Stdout().Take(), []Value{
 		"1\n",
 		"2\n",
 		"3\n",
 		"4\n",
 		"5\n",
-	}
-	if !reflect.DeepEqual(actualEvents, expectedEvents) {
-		t.Errorf("Expecting %#v got %#ev", expectedEvents, actualEvents)
-	}
+	})
 }
-
-func extractAtLeastValues(in <-chan Event, n int) ([]Value, error) {
-	buf := make([]Value, 0, n)
-	for len(buf) < n {
-		select {
-		case ev := <-in:
-			buf = append(buf, ev.Main)
-		default:
-			return buf, fmt.Errorf("Unable to read %v events from channel got %v", n, len(buf))
-		}
-	}
-	return buf, nil
-}
-
 func TestFunctionDefinition(t *testing.T) {
 	vm := NewVM()
 	_, err := vm.Run(`{
@@ -169,27 +120,33 @@ func TestFunctionDefinition(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unable to call-func with parameters: %v", err)
 	} else {
-		out := vm.Stdout()
-		var sink []Value
-	LOOP:
-		for {
-			select {
-			case ev := <-out:
-				sink = append(sink, ev.Main)
-				if len(sink) == 2 {
-					break LOOP
-				}
-			default:
-				t.Error("out channel should have at least two entries")
-			}
-		}
-		if !reflect.DeepEqual(sink[0], fmt.Sprintf("10 [ 10 20 ] 10 20 30\n")) {
-			t.Errorf("Unexpected value %#v in stdout channel", sink[0])
-		}
-		if !reflect.DeepEqual(sink[1], fmt.Sprintf("30\n")) {
-			t.Errorf("Unexpected value %#v in stdout channel", sink[1])
+		assertOutput(t, vm.Stdout().Take(), []Value{
+			"10 [ 10 20 ] 10 20 30\n",
+			"30\n",
+		})
+	}
+}
+
+func assertOutput(t *testing.T, output <-chan interface{}, values []Value) []Value {
+	items, err := extractAtLeastValues(output, len(values))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(items, values) {
+		t.Errorf("Expecting %#v got %#v", values, items)
+	}
+	return items
+}
+
+func extractAtLeastValues(in <-chan interface{}, n int) ([]Value, error) {
+	buf := make([]Value, 0, n)
+	for len(buf) < n {
+		select {
+		case ev := <-in:
+			buf = append(buf, ev)
 		}
 	}
+	return buf, nil
 }
 
 func TestFunctionsCannotDeclareOtherFunctions(t *testing.T) {
