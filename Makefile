@@ -7,8 +7,8 @@ test: build
 	go clean -testcache
 	go test -timeout 2s  ./...
 
-benchmark: test
-	go test -bench=. -benchtime=15s ./mailbox
+benchmark:
+	go test -bench=. ./mailbox
 
 tidy:
 	go fmt ./...
