@@ -1,10 +1,14 @@
-.PHONY: watch build tidy deps gogen test
+.PHONY: watch build tidy deps gogen test benchmark
 
 build:
 	go build ./...
 
 test: build
-	go test ./...
+	go clean -testcache
+	go test -timeout 2s  ./...
+
+benchmark: test
+	go test -bench=. ./mailbox
 
 tidy:
 	go fmt ./...

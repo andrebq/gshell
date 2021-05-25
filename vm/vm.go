@@ -1,12 +1,14 @@
 package vm
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
 
 	"github.com/andrebq/gshell/ast"
 	"github.com/andrebq/gshell/internal/parser"
+	"github.com/andrebq/gshell/mailbox"
 )
 
 type (
@@ -18,6 +20,19 @@ type (
 		chlock        sync.RWMutex
 		rootCtx       *Context
 		currentModule ast.Symbol
+
+		// shortcuts to the actors registered in pid
+		stdout *Actor
+		stderr *Actor
+		stdin  *Actor
+
+		pids map[ast.Symbol]*Actor
+	}
+
+	Actor struct {
+		box        mailbox.Box
+		scope      ast.Symbol
+		identifier ast.Symbol
 	}
 
 	Module struct {
@@ -44,6 +59,7 @@ type (
 	}
 
 	Context struct {
+		goCtx      context.Context
 		parent     *Context
 		refs       map[ast.Symbol]Value
 		isFunction bool
@@ -57,21 +73,27 @@ type (
 )
 
 var (
-	printlnSym = mustSym("println")
-	letSym     = mustSym("let")
-	switchSym  = mustSym("switch")
-	elseSym    = mustSym("else")
-	caseSym    = mustSym("case")
-	guardSym   = mustSym("guard")
-	fromSym    = mustSym("from")
-	toSym      = mustSym("to")
-	loop       = mustSym("loop")
-	funcSym    = mustSym("func")
+	printlnSym = ast.MustNewSymbol("println")
+	letSym     = ast.MustNewSymbol("let")
+	switchSym  = ast.MustNewSymbol("switch")
+	elseSym    = ast.MustNewSymbol("else")
+	caseSym    = ast.MustNewSymbol("case")
+	guardSym   = ast.MustNewSymbol("guard")
+	fromSym    = ast.MustNewSymbol("from")
+	toSym      = ast.MustNewSymbol("to")
+	loop       = ast.MustNewSymbol("loop")
+	funcSym    = ast.MustNewSymbol("func")
 
-	trueSym  = mustSym("true")
-	falseSym = mustSym("false")
+	trueSym  = ast.MustNewSymbol("true")
+	falseSym = ast.MustNewSymbol("false")
 
-	mainModuleSym = mustSym("main")
+	localSym = ast.MustNewSymbol("local")
+
+	stdoutSym = ast.MustNewSymbol("stdout")
+	stderrSym = ast.MustNewSymbol("stderr")
+	stdinSym  = ast.MustNewSymbol("stdin")
+
+	mainModuleSym = ast.MustNewSymbol("main")
 
 	ErrChannelNotFound = errors.New("channel not found")
 )
@@ -94,19 +116,19 @@ func EmptyModule(ctx *Context) *Module {
 	}
 }
 
-func NewRootContext() *Context {
+func newRootContext() *Context {
 	rootCtx := NewContext(nil)
 
 	const defaultChanSize = 1000
-	rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))
-	rootCtx.Set(StdinChannel, make(chan Event, defaultChanSize))
-	rootCtx.Set(StdoutChannel, make(chan Event, defaultChanSize))
+	rootCtx.Set(stdinSym, make(chan Event, defaultChanSize))
+	rootCtx.Set(stdoutSym, make(chan Event, defaultChanSize))
+	rootCtx.Set(stderrSym, make(chan Event, defaultChanSize))
 
 	return rootCtx
 }
 
 func NewVM() *VM {
-	rootCtx := NewRootContext()
+	rootCtx := newRootContext()
 
 	vm := &VM{
 		builtins: make(map[ast.Symbol]Process),
@@ -115,6 +137,7 @@ func NewVM() *VM {
 		},
 		rootCtx:       rootCtx,
 		currentModule: mainModuleSym,
+		pids:          make(map[ast.Symbol]*Actor),
 	}
 	vm.builtins[printlnSym] = ProcessFunc(GShellPrintln)
 	vm.builtins[letSym] = ProcessFunc(GShellLetVariable)
@@ -125,27 +148,33 @@ func NewVM() *VM {
 	vm.builtins[loop] = ProcessFunc(GShellLoop)
 	vm.builtins[funcSym] = ProcessFunc(GShellFunc)
 
+	vm.stdout = vm.newActor(localSym, stdoutSym)
+	vm.stderr = vm.newActor(localSym, stderrSym)
+	vm.stdin = vm.newActor(localSym, stdinSym)
+
 	return vm
 }
 
-func (v *VM) Stdout() <-chan Event {
-	return v.getDefaultChannel(StdoutChannel)
-}
-
-func (v *VM) Stderr() <-chan Event {
-	return v.getDefaultChannel(StderrChannel)
-}
-
-func (v *VM) Stdin() chan<- Event {
-	return v.getDefaultChannel(StdinChannel)
-}
-
-func (v *VM) getDefaultChannel(name ast.Symbol) chan Event {
-	ev, ok := v.rootCtx.Get(name)
-	if !ok {
-		return nil
+func (v *VM) newActor(scope ast.Symbol, id ast.Symbol) *Actor {
+	upid := ast.ScopedSymbol(scope, id)
+	actor := v.pids[upid]
+	if actor == nil {
+		actor = &Actor{
+			box:        mailbox.NonBlocking(100),
+			scope:      scope,
+			identifier: id,
+		}
+		v.pids[upid] = actor
 	}
-	return ev.(chan Event)
+	return actor
+}
+
+func (v *VM) Stdout() mailbox.Reader {
+	return v.stdout.box.Reader()
+}
+
+func (v *VM) Stderr() mailbox.Reader {
+	return v.stderr.box.Reader()
 }
 
 func (v *VM) Run(code string) (interface{}, error) {
@@ -251,26 +280,19 @@ func (v *VM) callBuiltin(call *CallStack, value Process) {
 	value.Run(call)
 }
 
-func (v *VM) PushValues(chname ast.Symbol, ctx *Context, values ...Value) bool {
-	ch, ok := ctx.Get(chname)
-	if !ok {
+func (v *VM) enqueueValue(pid ast.Symbol, ctx *Context, values ...Value) bool {
+	actor := v.pids[pid]
+	if actor == nil {
 		return false
 	}
-	if ch, ok := ch.(chan Event); ok {
-		for _, v := range values {
-			// TODO: this is blocking, allow some for of safely closing the VM
-			// even when this operation is going on
-			var ev Event
-			switch v := v.(type) {
-			case Event:
-			default:
-				ev.Main = v
-			}
-			ch <- ev
+	for _, v := range values {
+		err := mailbox.BlockingPush(ctx.goCtx, actor.box, v)
+		if err != nil {
+			// TODO: think about how to handle errors here
+			return false
 		}
-		return true
 	}
-	return false
+	return true
 }
 
 func (v *VM) Eval(ctx *Context, a ast.Argument) (interface{}, error) {

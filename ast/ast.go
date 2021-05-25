@@ -3,6 +3,7 @@ package ast
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 
@@ -178,11 +179,31 @@ func NewText(t string) Text {
 	return Text{string: t}
 }
 
+// MustNewSymbol is useful for initialization functions,
+// or blocks of code that have symbols hardcoded.
+//
+// Use this function instead of panicking from client code,
+// as the behaviour of this function is expected to be,
+// checked by unit-tests for every version.
+func MustNewSymbol(s string) Symbol {
+	sym, err := NewSymbol(s)
+	if err != nil {
+		panic(err)
+	}
+	return sym
+}
+
 func NewSymbol(s string) (Symbol, error) {
 	if !symbolRe.MatchString(s) {
 		return Symbol{}, errNotAValidSymbol
 	}
 	return Symbol{sym: s}, nil
+}
+
+func ScopedSymbol(scope Symbol, id Symbol) Symbol {
+	return Symbol{
+		sym: fmt.Sprintf("%v/%v", scope.sym, id.sym),
+	}
 }
 
 func NewVar(sym Symbol) Var { return Var{sym} }

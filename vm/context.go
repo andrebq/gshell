@@ -1,10 +1,21 @@
 package vm
 
-import "github.com/andrebq/gshell/ast"
+import (
+	"context"
+
+	"github.com/andrebq/gshell/ast"
+)
 
 func NewContext(parent *Context) *Context {
+	var goCtx context.Context
+	if parent != nil {
+		goCtx = parent.goCtx
+	} else {
+		goCtx = context.Background()
+	}
 	return &Context{
 		parent:     parent,
+		goCtx:      goCtx,
 		refs:       make(map[ast.Symbol]Value),
 		isFunction: parent.IsFunction(),
 	}

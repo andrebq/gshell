@@ -10,12 +10,6 @@ import (
 	"github.com/andrebq/gshell/ast/match"
 )
 
-var (
-	StdoutChannel = mustSym("stdout")
-	StdinChannel  = mustSym("stdin")
-	StderrChannel = mustSym("stderr")
-)
-
 func GShellLetVariable(c *CallStack) {
 	if len(c.RawArgs) != 2 {
 		c.FailWith = errors.New("Invalid use of 'let', should be: 'let <$variableName> <value>'")
@@ -53,7 +47,7 @@ func GShellPrintln(c *CallStack) {
 			parts[i] = fmt.Sprintf("%v", v)
 		}
 	}
-	c.VM.PushValues(StdoutChannel, c.Context, strings.Join(parts, " ")+"\n")
+	c.VM.enqueueValue(ast.ScopedSymbol(localSym, stdoutSym), c.Context, strings.Join(parts, " ")+"\n")
 	c.ReturnValue = trueSym
 }
 
