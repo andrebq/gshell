@@ -140,7 +140,7 @@ func (b *box) Take() interface{} {
 			return
 		}
 		ret = b.buf[0]
-		copy(b.buf[1:], b.buf[:len(b.buf)-1])
+		copy(b.buf[0:], b.buf[1:])
 		b.buf[len(b.buf)-1] = nil
 		b.buf = b.buf[:len(b.buf)-1]
 

@@ -7,7 +7,7 @@ test: build
 	go clean -testcache
 	go test -timeout 2s  ./...
 
-benchmark:
+benchmark: test
 	go test -bench=. ./mailbox
 
 tidy:

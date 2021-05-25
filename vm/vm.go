@@ -1,6 +1,7 @@
 package vm
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -58,6 +59,7 @@ type (
 	}
 
 	Context struct {
+		goCtx      context.Context
 		parent     *Context
 		refs       map[ast.Symbol]Value
 		isFunction bool
@@ -114,7 +116,7 @@ func EmptyModule(ctx *Context) *Module {
 	}
 }
 
-func NewRootContext() *Context {
+func newRootContext() *Context {
 	rootCtx := NewContext(nil)
 
 	const defaultChanSize = 1000
@@ -126,7 +128,7 @@ func NewRootContext() *Context {
 }
 
 func NewVM() *VM {
-	rootCtx := NewRootContext()
+	rootCtx := newRootContext()
 
 	vm := &VM{
 		builtins: make(map[ast.Symbol]Process),
@@ -158,7 +160,7 @@ func (v *VM) newActor(scope ast.Symbol, id ast.Symbol) *Actor {
 	actor := v.pids[upid]
 	if actor == nil {
 		actor = &Actor{
-			box:        mailbox.Blocking(100),
+			box:        mailbox.NonBlocking(100),
 			scope:      scope,
 			identifier: id,
 		}
@@ -284,7 +286,7 @@ func (v *VM) enqueueValue(pid ast.Symbol, ctx *Context, values ...Value) bool {
 		return false
 	}
 	for _, v := range values {
-		err := <-actor.box.Push(v)
+		err := mailbox.BlockingPush(ctx.goCtx, actor.box, v)
 		if err != nil {
 			// TODO: think about how to handle errors here
 			return false

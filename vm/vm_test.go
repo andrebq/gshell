@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/andrebq/gshell/mailbox"
 )
 
 func TestVM(t *testing.T) {
@@ -15,14 +17,9 @@ func TestVM(t *testing.T) {
 		t.Error(err)
 	}
 
-	select {
-	case entry := <-vm.Stdout().Take():
-		if !reflect.DeepEqual(entry, fmt.Sprintf("hello world\n")) {
-			t.Errorf("Unexpected value %#v in stdout channel", entry)
-		}
-	default:
-		t.Error("out channel should have at least one entry")
-	}
+	assertOutput(t, vm.Stdout(), []Value{
+		"hello world\n",
+	})
 }
 
 func TestSetVariable(t *testing.T) {
@@ -35,13 +32,12 @@ func TestSetVariable(t *testing.T) {
 	}
 
 	out := vm.Stdout()
-	select {
-	case ev := <-out.Take():
-		if !reflect.DeepEqual(ev, fmt.Sprintf("123\n")) {
-			t.Errorf("Unexpected value %#v in stdout channel", ev)
-		}
-	default:
-		t.Error("out channel should have at least one entry")
+	value := out.Take()
+	if value == nil {
+		t.Fatal("output should have at least one item")
+	}
+	if !reflect.DeepEqual(value, fmt.Sprintf("123\n")) {
+		t.Errorf("Unexpected value %#v in stdout channel", value)
 	}
 }
 
@@ -60,7 +56,7 @@ func TestConditional(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	items, err := extractAtLeastValues(vm.Stdout().Take(), 2)
+	items, err := extractAtLeastValues(vm.Stdout(), 2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +76,7 @@ func TestGuard(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	assertOutput(t, vm.Stdout().Take(), []Value{
+	assertOutput(t, vm.Stdout(), []Value{
 		"1\n",
 		"10\n",
 	})
@@ -96,7 +92,7 @@ func TestSequenceLoop(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assertOutput(t, vm.Stdout().Take(), []Value{
+	assertOutput(t, vm.Stdout(), []Value{
 		"1\n",
 		"2\n",
 		"3\n",
@@ -120,14 +116,14 @@ func TestFunctionDefinition(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unable to call-func with parameters: %v", err)
 	} else {
-		assertOutput(t, vm.Stdout().Take(), []Value{
+		assertOutput(t, vm.Stdout(), []Value{
 			"10 [ 10 20 ] 10 20 30\n",
 			"30\n",
 		})
 	}
 }
 
-func assertOutput(t *testing.T, output <-chan interface{}, values []Value) []Value {
+func assertOutput(t *testing.T, output mailbox.Reader, values []Value) []Value {
 	items, err := extractAtLeastValues(output, len(values))
 	if err != nil {
 		t.Fatal(err)
@@ -138,13 +134,14 @@ func assertOutput(t *testing.T, output <-chan interface{}, values []Value) []Val
 	return items
 }
 
-func extractAtLeastValues(in <-chan interface{}, n int) ([]Value, error) {
+func extractAtLeastValues(in mailbox.Reader, n int) ([]Value, error) {
 	buf := make([]Value, 0, n)
 	for len(buf) < n {
-		select {
-		case ev := <-in:
-			buf = append(buf, ev)
+		v := in.Take()
+		if v == nil {
+			return nil, fmt.Errorf("Buffer was empty at %v elements", len(buf))
 		}
+		buf = append(buf, v)
 	}
 	return buf, nil
 }
