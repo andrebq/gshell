@@ -149,7 +149,7 @@ func extractAtLeastValues(in mailbox.Reader, n int) ([]Value, error) {
 func TestFunctionsCannotDeclareOtherFunctions(t *testing.T) {
 	vm := NewVM()
 	_, err := vm.Run(`{
-		func print-a-and-b [$a,$b] {
+		func print-a-and-b [$a $b] {
 			func internal [] {
 				true
 			}
@@ -158,5 +158,23 @@ func TestFunctionsCannotDeclareOtherFunctions(t *testing.T) {
 	}`)
 	if err == nil {
 		t.Fatal("Gshell should not support internal function definitions (yet!)")
+	}
+}
+
+func TestLoadModule(t *testing.T) {
+	vm := NewVM()
+	_, err := vm.Run(`{
+		import [
+			["./abc.gshell" abc]
+			["./cde.gshell" cde]
+		]
+
+		let $var 10
+
+		abc.say-hello $var
+		cde.say-hello $var
+		}`)
+	if err != nil {
+		t.Fatalf("Gshell should support modules! %v", err)
 	}
 }

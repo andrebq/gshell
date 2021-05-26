@@ -167,6 +167,10 @@ func (ab *astBuilder) ExitListArgument(c *ListArgumentContext) {
 	ab.stack.push(lst.Reverse())
 }
 
+func (ab *astBuilder) ExitTextArgument(c *TextArgumentContext) {
+	ab.stack.push(ast.NewText(c.GetText()))
+}
+
 func (s *stack) push(v interface{}) {
 	*s = append(*s, v)
 }

@@ -59,6 +59,12 @@ type GShellListener interface {
 	// EnterListArgument is called when entering the listArgument production.
 	EnterListArgument(c *ListArgumentContext)
 
+	// EnterListArgumentItems is called when entering the listArgumentItems production.
+	EnterListArgumentItems(c *ListArgumentItemsContext)
+
+	// EnterTextArgument is called when entering the textArgument production.
+	EnterTextArgument(c *TextArgumentContext)
+
 	// ExitStart is called when exiting the start production.
 	ExitStart(c *StartContext)
 
@@ -109,4 +115,10 @@ type GShellListener interface {
 
 	// ExitListArgument is called when exiting the listArgument production.
 	ExitListArgument(c *ListArgumentContext)
+
+	// ExitListArgumentItems is called when exiting the listArgumentItems production.
+	ExitListArgumentItems(c *ListArgumentItemsContext)
+
+	// ExitTextArgument is called when exiting the textArgument production.
+	ExitTextArgument(c *TextArgumentContext)
 }
