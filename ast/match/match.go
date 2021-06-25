@@ -135,3 +135,18 @@ func AnySymbol(out *ast.Symbol) Condition {
 		return true
 	}
 }
+
+func Text(out *ast.Text) Condition {
+	return func(args *[]ast.Argument) bool {
+		if len(*args) == 0 {
+			return false
+		}
+		var ok bool
+		*out, ok = (*args)[0].(ast.Text)
+		if !ok {
+			return false
+		}
+		*args = (*args)[1:]
+		return true
+	}
+}

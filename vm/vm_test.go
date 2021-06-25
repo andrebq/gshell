@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/andrebq/gshell/ast"
 	"github.com/andrebq/gshell/mailbox"
 )
 
@@ -163,10 +164,18 @@ func TestFunctionsCannotDeclareOtherFunctions(t *testing.T) {
 
 func TestLoadModule(t *testing.T) {
 	vm := NewVM()
+	ml := NewMemoryLoader()
+	if err := ml.AddCode(ast.NewText("abc.gshell"), "{ func say-hello [$a] { println \"abc\" $a } }"); err != nil {
+		t.Fatal(err)
+	}
+	if err := ml.AddCode(ast.NewText("cde.gshell"), "{ func say-hello [$a] { println \"abc\" $a } }"); err != nil {
+		t.Fatal(err)
+	}
+	vm.SetModuleParser(ml)
 	_, err := vm.Run(`{
 		import [
-			["./abc.gshell" abc]
-			["./cde.gshell" cde]
+			["abc.gshell" abc]
+			["cde.gshell" cde]
 		]
 
 		let $var 10
