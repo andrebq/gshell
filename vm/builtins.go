@@ -218,7 +218,8 @@ func GShellFunc(c *CallStack) {
 	}
 
 	cm := c.VM.currentModule
-	module := c.VM.modules[c.VM.currentModule]
+	println("current module", cm.String())
+	module := c.VM.modules[cm]
 	if module == nil {
 		c.FailWith = errors.New("VM does not have a current module therefore a function cannot be defined")
 		return

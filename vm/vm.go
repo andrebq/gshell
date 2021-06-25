@@ -210,7 +210,7 @@ func (v *VM) Run(code string) (interface{}, error) {
 }
 
 func (v *VM) runModule(name ast.Text, ast *ast.Ast) (interface{}, error) {
-	return v.switchModule(mainModuleText, func(module *Module) (interface{}, error) {
+	return v.switchModule(name, func(module *Module) (interface{}, error) {
 		return v.evalScript(module.definitions, ast.Root())
 	})
 }
@@ -220,6 +220,7 @@ func (v *VM) switchModule(name ast.Text, fn func(*Module) (interface{}, error)) 
 	defer func() {
 		v.currentModule = oldModule
 	}()
+	v.currentModule = name
 	module, ok := v.modules[name]
 	if !ok {
 		module = EmptyModule(v.rootCtx)
@@ -279,6 +280,13 @@ func (v *VM) runCommand(ctx *Context, cmd *ast.Cmd) *CallStack {
 		v.callValue(call, value)
 		return call
 	}
+
+	// TODO: CONTINUE HERE
+	// add a function to check if the cmd symbol is scoped
+	// and extracts the scope, that will allow us to lookup the module
+	//
+	// rename local/refs/pids sccopes to _local/_refs/_pids scopes, that way
+	// users are free to use that scope for local variables
 
 	moduleFunc, found := v.modules[v.currentModule].definitions.Get(cmd.Command())
 	if found {
