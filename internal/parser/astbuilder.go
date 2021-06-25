@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/andrebq/gshell/ast"
 	"github.com/antlr/antlr4/runtime/Go/antlr"
@@ -165,6 +166,16 @@ func (ab *astBuilder) ExitListArgument(c *ListArgumentContext) {
 		lst = lst.Append(v.(ast.Argument))
 	}
 	ab.stack.push(lst.Reverse())
+}
+
+func (ab *astBuilder) ExitTextArgument(c *TextArgumentContext) {
+	txt := c.GetText()
+	if strings.HasPrefix(txt, `"""`) {
+		txt = txt[3 : len(txt)-3]
+	} else {
+		txt = txt[1 : len(txt)-1]
+	}
+	ab.stack.push(ast.NewText(txt))
 }
 
 func (s *stack) push(v interface{}) {

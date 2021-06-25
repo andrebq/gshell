@@ -15,11 +15,13 @@ type (
 	VM struct {
 		builtins map[ast.Symbol]Process
 
-		modules map[ast.Symbol]*Module
+		modules map[ast.Text]*Module
+
+		loader ModuleParser
 
 		chlock        sync.RWMutex
 		rootCtx       *Context
-		currentModule ast.Symbol
+		currentModule ast.Text
 
 		// shortcuts to the actors registered in pid
 		stdout *Actor
@@ -27,6 +29,10 @@ type (
 		stdin  *Actor
 
 		pids map[ast.Symbol]*Actor
+	}
+
+	ModuleParser interface {
+		Parse(ctx context.Context, path ast.Text) (ast.Ast, error)
 	}
 
 	Actor struct {
@@ -37,6 +43,7 @@ type (
 
 	Module struct {
 		definitions *Context
+		loading     bool
 	}
 
 	Value interface{}
@@ -84,18 +91,27 @@ var (
 	loop       = ast.MustNewSymbol("loop")
 	funcSym    = ast.MustNewSymbol("func")
 
-	trueSym  = ast.MustNewSymbol("true")
-	falseSym = ast.MustNewSymbol("false")
+	trueSym   = ast.MustNewSymbol("true")
+	falseSym  = ast.MustNewSymbol("false")
+	importSym = ast.MustNewSymbol("import")
 
 	localSym = ast.MustNewSymbol("local")
+	refSym   = ast.MustNewSymbol("refs")
+	pidSym   = ast.MustNewSymbol("pids")
 
 	stdoutSym = ast.MustNewSymbol("stdout")
 	stderrSym = ast.MustNewSymbol("stderr")
 	stdinSym  = ast.MustNewSymbol("stdin")
 
-	mainModuleSym = ast.MustNewSymbol("main")
+	mainModuleText = ast.NewText("<main.gshell>")
 
 	ErrChannelNotFound = errors.New("channel not found")
+
+	reservedScopes = []ast.Symbol{
+		localSym,
+		refSym,
+		pidSym,
+	}
 )
 
 func (pf ProcessFunc) Run(c *CallStack) {
@@ -113,6 +129,7 @@ func mustSym(s string) ast.Symbol {
 func EmptyModule(ctx *Context) *Module {
 	return &Module{
 		definitions: NewContext(ctx),
+		loading:     true,
 	}
 }
 
@@ -132,27 +149,34 @@ func NewVM() *VM {
 
 	vm := &VM{
 		builtins: make(map[ast.Symbol]Process),
-		modules: map[ast.Symbol]*Module{
-			mainModuleSym: EmptyModule(rootCtx),
+		modules: map[ast.Text]*Module{
+			mainModuleText: EmptyModule(rootCtx),
 		},
 		rootCtx:       rootCtx,
-		currentModule: mainModuleSym,
+		currentModule: mainModuleText,
 		pids:          make(map[ast.Symbol]*Actor),
 	}
-	vm.builtins[printlnSym] = ProcessFunc(GShellPrintln)
-	vm.builtins[letSym] = ProcessFunc(GShellLetVariable)
-	vm.builtins[switchSym] = ProcessFunc(GShellSwitch)
+
 	vm.builtins[trueSym] = MakeIdentityProcess(trueSym)
 	vm.builtins[falseSym] = MakeIdentityProcess(falseSym)
+	vm.builtins[letSym] = ProcessFunc(GShellLetVariable)
+	vm.builtins[funcSym] = ProcessFunc(GShellFunc)
+	vm.builtins[importSym] = ProcessFunc(GShellImport)
+
+	vm.builtins[printlnSym] = ProcessFunc(GShellPrintln)
+	vm.builtins[switchSym] = ProcessFunc(GShellSwitch)
 	vm.builtins[guardSym] = ProcessFunc(GShellGuard)
 	vm.builtins[loop] = ProcessFunc(GShellLoop)
-	vm.builtins[funcSym] = ProcessFunc(GShellFunc)
 
 	vm.stdout = vm.newActor(localSym, stdoutSym)
 	vm.stderr = vm.newActor(localSym, stderrSym)
 	vm.stdin = vm.newActor(localSym, stdinSym)
 
 	return vm
+}
+
+func (v *VM) SetModuleParser(p ModuleParser) {
+	v.loader = p
 }
 
 func (v *VM) newActor(scope ast.Symbol, id ast.Symbol) *Actor {
@@ -182,8 +206,27 @@ func (v *VM) Run(code string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	ctx := NewContext(v.rootCtx)
-	return v.evalScript(ctx, ast.Root())
+	return v.runModule(v.currentModule, ast)
+}
+
+func (v *VM) runModule(name ast.Text, ast *ast.Ast) (interface{}, error) {
+	return v.switchModule(name, func(module *Module) (interface{}, error) {
+		return v.evalScript(module.definitions, ast.Root())
+	})
+}
+
+func (v *VM) switchModule(name ast.Text, fn func(*Module) (interface{}, error)) (interface{}, error) {
+	oldModule := v.currentModule
+	defer func() {
+		v.currentModule = oldModule
+	}()
+	v.currentModule = name
+	module, ok := v.modules[name]
+	if !ok {
+		module = EmptyModule(v.rootCtx)
+		v.modules[name] = module
+	}
+	return fn(module)
 }
 
 func (v *VM) evalList(ctx *Context, lst *ast.List) (*ast.List, error) {
@@ -214,6 +257,7 @@ func (v *VM) evalScript(ctx *Context, sc *ast.Script) (Value, error) {
 		call := v.runCommand(ctx, c)
 		lastReturn = call.ReturnValue
 		if call.FailWith != nil {
+			// println
 			return nil, call.FailWith
 		}
 	}
@@ -236,6 +280,13 @@ func (v *VM) runCommand(ctx *Context, cmd *ast.Cmd) *CallStack {
 		v.callValue(call, value)
 		return call
 	}
+
+	// TODO: CONTINUE HERE
+	// add a function to check if the cmd symbol is scoped
+	// and extracts the scope, that will allow us to lookup the module
+	//
+	// rename local/refs/pids sccopes to _local/_refs/_pids scopes, that way
+	// users are free to use that scope for local variables
 
 	moduleFunc, found := v.modules[v.currentModule].definitions.Get(cmd.Command())
 	if found {
@@ -263,13 +314,15 @@ func (v *VM) callFunction(call *CallStack, funcDeclaration *function) {
 		}
 		ctx.Set(funcDeclaration.args[i].Name(), argValue)
 	}
-	v.evalScript(ctx, funcDeclaration.body)
+	call.ReturnValue, call.FailWith = v.evalScript(ctx, funcDeclaration.body)
 }
 
 func (v *VM) callValue(call *CallStack, value Value) {
 	switch value := value.(type) {
 	case Process:
 		value.Run(call)
+	case *function:
+		v.callFunction(call, value)
 	default:
 		call.FailWith = fmt.Errorf("Value %q is not callable", value)
 	}
@@ -336,6 +389,27 @@ func (v *VM) EvalAndCast(ctx *Context, arg ast.Argument, out interface{}) error 
 	return v.CastTo(ctx, value, out)
 }
 
+func (v *VM) loadModule(ctx *Context, dest ast.Symbol, path ast.Text) error {
+	if v.loader == nil {
+		return errors.New("there are no loaders configured for this VM")
+	}
+
+	if !ctx.CanBind(dest) {
+		return fmt.Errorf("symbol %v already defined", dest)
+	}
+
+	if _, found := v.modules[path]; found {
+		return nil
+	}
+
+	ast, err := v.loader.Parse(context.TODO(), path)
+	if err != nil {
+		return fmt.Errorf("unable to parse module %v, cause: %v", path, err)
+	}
+	_, err = v.runModule(path, &ast)
+	return err
+}
+
 func (v *VM) castToBool(ctx *Context, input interface{}, out *bool) error {
 	*out = false
 	switch input := input.(type) {
@@ -368,7 +442,7 @@ func (v *VM) castToFloat(ctx *Context, input interface{}, out *float64) error {
 	return nil
 }
 
-func (v *VM) newFunction(ctx *Context, module, name ast.Symbol, args *ast.List, script *ast.Script) *function {
+func (v *VM) newFunction(ctx *Context, module ast.Text, name ast.Symbol, args *ast.List, script *ast.Script) *function {
 	var items []ast.Var
 	args.ForEach(func(a ast.Argument) bool {
 		items = append(items, a.(ast.Var))

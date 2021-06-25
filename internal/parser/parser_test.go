@@ -39,6 +39,14 @@ var (
 		{subject: "can parse lists as argument",
 			code: `{ echo [ 123  $abc identifier ] }`,
 			fmt:  `{ echo [ 123 $abc identifier ] }`},
+		{subject: "can parse strings",
+			code: `{ echo """this is a string with 7 words""" }`,
+			fmt:  `{ echo """this is a string with 7 words""" }`},
+		{subject: "can parse multi-line strings",
+			code: `{ echo """this is a string with 7
+			newlines""" }`,
+			fmt: `{ echo """this is a string with 7
+			newlines""" }`},
 	}
 )
 
@@ -47,19 +55,19 @@ func TestParser(t *testing.T) {
 		code := tc.code
 		ast, err := Parse(code)
 		if err != tc.expectedError {
-			t.Errorf("Case: %v expected %v but got %v", tc.subject, tc.expectedError, err)
+			t.Errorf("Case: '%v' expected %v but got %v", tc.subject, tc.expectedError, err)
 			return
 		}
 		fmtAst := ast.String()
 		if fmtAst != tc.fmt {
-			t.Errorf("Case: %v Should format to %q got %q", tc.subject, tc.fmt, fmtAst)
+			t.Errorf("Case: '%v' Should format to %q got %q", tc.subject, tc.fmt, fmtAst)
 		}
 		secondAst, err := Parse(fmtAst)
 		if err != tc.expectedError {
-			t.Errorf("Case: %v Formatted error caused a different error: %v", tc.subject, err)
+			t.Errorf("Case: '%v' Formatted error caused a different error: %v", tc.subject, err)
 		}
 		if !reflect.DeepEqual(ast, secondAst) {
-			t.Errorf("Case: %v Generated AST's do not match", tc.subject)
+			t.Errorf("Case: '%v' Generated AST's do not match", tc.subject)
 		}
 	}
 

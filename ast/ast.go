@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/andrebq/gshell/internal/pdata"
 )
@@ -66,6 +68,14 @@ var (
 func (s Symbol) Fmt(p Printer) {
 	p.WriteString(s.sym)
 }
+func (s Symbol) WithinScope(scopes ...Symbol) bool {
+	for _, scope := range scopes {
+		if strings.HasPrefix(s.sym, scope.sym) {
+			return true
+		}
+	}
+	return false
+}
 func (s Symbol) Text() string   { return s.sym }
 func (s Symbol) anchor()        {}
 func (s Symbol) String() string { return s.sym }
@@ -78,7 +88,43 @@ func (n Number) anchor()          {}
 func (n Number) String() string   { return strconv.FormatFloat(n.float64, 'f', -1, 64) }
 
 func (t Text) Fmt(p Printer) {
-	p.WriteString(t.string)
+	var buf bytes.Buffer
+	str := string(t.string)
+	buf.WriteString(`"""`)
+	for len(str) > 0 {
+		r, sz := utf8.DecodeRuneInString(str)
+		str = str[sz:]
+		if r == utf8.RuneError {
+			break
+		}
+		switch r {
+		case 0x07:
+			buf.WriteString(`\a`)
+		case 0x08:
+			buf.WriteString(`\b`)
+		case 0x1B:
+			buf.WriteString(`\e`)
+		case 0x0C:
+			buf.WriteString(`\f`)
+		case 0x0A, 0x0D, 0x09:
+			buf.WriteRune(r)
+		case 0x0B:
+			buf.WriteString(`\v`)
+		case 0x05:
+			buf.WriteString(`\\`)
+		case 0:
+			buf.WriteString(`\0`)
+		case '"':
+			// TODO: there is probably a better way than escaping
+			// every single double quote, given that all strings are
+			// rendered as triple quoted strings
+			buf.WriteString(`\"`)
+		default:
+			buf.WriteRune(r)
+		}
+	}
+	buf.WriteString(`"""`)
+	p.WriteString(buf.String())
 }
 func (t Text) Text() string   { return t.string }
 func (t Text) String() string { return t.string }
@@ -176,7 +222,43 @@ func NewNumber(v float64) Number {
 }
 
 func NewText(t string) Text {
-	return Text{string: t}
+	buf := bytes.Buffer{}
+	for len(t) > 0 {
+		r, n := utf8.DecodeRuneInString(t)
+		t = t[n:]
+		switch r {
+		default:
+			buf.WriteRune(r)
+		case '\\':
+			r, n = utf8.DecodeRuneInString(t)
+			t = t[n:]
+			switch r {
+			case 'a':
+				buf.WriteRune(0x07)
+			case 'b':
+				buf.WriteRune(0x08)
+			case 'e':
+				buf.WriteRune(0x1B)
+			case 'f':
+				buf.WriteRune(0x0C)
+			case 'n':
+				buf.WriteRune(0x0A)
+			case 'r':
+				buf.WriteRune(0x0D)
+			case 't':
+				buf.WriteRune(0x09)
+			case 'v':
+				buf.WriteRune(0x0B)
+			case '\\':
+				buf.WriteRune(0x05)
+			case '0':
+				buf.WriteByte(0)
+			case '"':
+				buf.WriteString("\"")
+			}
+		}
+	}
+	return Text{string: buf.String()}
 }
 
 // MustNewSymbol is useful for initialization functions,

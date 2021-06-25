@@ -188,13 +188,13 @@ func GShellLoop(c *CallStack) {
 }
 
 func GShellFunc(c *CallStack) {
-	// for now, let's just now allow functions to define functions
+	// for now, let's just not allow functions to define functions
 	// this is cutting on the capability of creating closures
 	// which is kind of important on a purely immutable language...
 	//
 	// but bash doesn't have it and it kinda works ok there :-)
 	// so no fancy schmancy high-order functions for you!
-	if c.Context.isFunction {
+	if c.Context.IsFunction() {
 		c.FailWith = errors.New("Functions cannot define other functions... sorry :(")
 		return
 	}
@@ -213,8 +213,13 @@ func GShellFunc(c *CallStack) {
 		return
 	}
 
+	if funcName.WithinScope(reservedScopes...) {
+		c.FailWith = fmt.Errorf("Functions cannot be scoped as: %v", reservedScopes)
+	}
+
 	cm := c.VM.currentModule
-	module := c.VM.modules[c.VM.currentModule]
+	println("current module", cm.String())
+	module := c.VM.modules[cm]
 	if module == nil {
 		c.FailWith = errors.New("VM does not have a current module therefore a function cannot be defined")
 		return

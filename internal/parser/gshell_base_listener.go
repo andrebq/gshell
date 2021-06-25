@@ -122,3 +122,15 @@ func (s *BaseGShellListener) EnterListArgument(ctx *ListArgumentContext) {}
 
 // ExitListArgument is called when production listArgument is exited.
 func (s *BaseGShellListener) ExitListArgument(ctx *ListArgumentContext) {}
+
+// EnterListArgumentItems is called when production listArgumentItems is entered.
+func (s *BaseGShellListener) EnterListArgumentItems(ctx *ListArgumentItemsContext) {}
+
+// ExitListArgumentItems is called when production listArgumentItems is exited.
+func (s *BaseGShellListener) ExitListArgumentItems(ctx *ListArgumentItemsContext) {}
+
+// EnterTextArgument is called when production textArgument is entered.
+func (s *BaseGShellListener) EnterTextArgument(ctx *TextArgumentContext) {}
+
+// ExitTextArgument is called when production textArgument is exited.
+func (s *BaseGShellListener) ExitTextArgument(ctx *TextArgumentContext) {}
